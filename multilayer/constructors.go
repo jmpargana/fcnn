@@ -49,13 +49,14 @@ func startHiddenLayers(hiddenActFn string, hiddenLayers []int) ([]layer.Layer, e
 		return nil, errors.New("at least one hidden layer is needed")
 	}
 
-	hLayers := make([]layer.Layer, 0, len(hiddenLayers))
+	hLayers := make([]layer.Layer, 0, len(hiddenLayers)-1)
 
 	for i := 0; i < len(hiddenLayers)-1; i++ {
 		l, err := layer.New(hiddenActFn, hiddenLayers[i], hiddenLayers[i+1])
 		if err != nil {
 			return nil, err
 		}
+
 		hLayers = append(hLayers, l)
 	}
 

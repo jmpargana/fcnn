@@ -20,7 +20,7 @@ func TestNewLayer(t *testing.T) {
 			t.Errorf("sum and output vector should have the same size")
 		}
 
-		if layer.sum.NumRows != layer.weights.NumCols {
+		if layer.sum.NumRows != layer.weights.NumRows {
 			t.Errorf("sum and weight matrix should have the matching sizes")
 		}
 	}

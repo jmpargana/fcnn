@@ -21,7 +21,7 @@ func New(actFn string, inSize, outSize int) (Layer, error) {
 		return Layer{}, errors.New(fmt.Sprintf("that would be an invalid size for a matrix: %dx%d", inSize, outSize))
 	}
 
-	weights := matrix.NewRandom(inSize, outSize)
+	weights := matrix.NewRandom(outSize, inSize)
 	output, sum := matrix.New(outSize, 1), matrix.New(outSize, 1)
 
 	return Layer{
