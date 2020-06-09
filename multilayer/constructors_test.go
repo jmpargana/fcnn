@@ -26,3 +26,50 @@ func TestHiddenLayers(t *testing.T) {
 		}
 	}
 }
+
+func TestInvalidHiddenLayers(t *testing.T) {
+	for _, hl := range invalidHiddenLayersTest {
+		_, err := startHiddenLayers("relu", hl)
+		if err == nil {
+			t.Errorf("shouldn have failed here")
+		}
+	}
+}
+
+func TestInvalidLearningRate(t *testing.T) {
+	_, err := New([]int{1, 1}, 1, "relu", "relu", 1, 1, 0)
+	if err == nil {
+		t.Errorf("learning rate should be between 0 and 1")
+	}
+
+	_, err = New([]int{1, 1}, 1, "relu", "relu", 1, 1, 1)
+	if err == nil {
+		t.Errorf("learning rate should be between 0 and 1")
+	}
+}
+
+func TestInvalidBatchEpochSizes(t *testing.T) {
+	_, err := New([]int{1, 1}, 1, "relu", "relu", 0, 1, 0.5)
+	if err == nil {
+		t.Errorf("shouldn't be able to build with batch size 0")
+	}
+
+	_, err = New([]int{1, 1}, 1, "relu", "relu", 1, 0, 0.5)
+	if err == nil {
+		t.Errorf("shouldn't be able to build with epoch size 0")
+	}
+
+	_, err = New([]int{1, 1}, 1, "relu", "relu", -3, 1, 0.5)
+	if err == nil {
+		t.Errorf("shouldn't be able to build with negative batch size")
+	}
+	_, err = New([]int{1, 1}, 1, "relu", "relu", 1, -11, 0.5)
+	if err == nil {
+		t.Errorf("shouldn't be able to build with negative epoch size")
+	}
+
+	_, err = New([]int{1, 1}, 1, "relu", "unavailable", 1, 1, 0.5)
+	if err == nil {
+		t.Errorf("shouldn't be able to build with non valid activation function")
+	}
+}
