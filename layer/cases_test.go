@@ -1,7 +1,5 @@
 package layer
 
-import "github.com/jmpargana/matrix"
-
 type layerTestStruct struct {
 	actFn   string
 	inSize  int
@@ -10,7 +8,130 @@ type layerTestStruct struct {
 
 type forwPropsTestStruct struct {
 	actFn                 string
-	in, out, sum, weights matrix.Matrix
+	in, out, sum, weights [][]float64
+}
+
+var forwPropsTest = []forwPropsTestStruct{
+	{
+		actFn: "identity",
+		in: [][]float64{
+			{2},
+			{-3},
+			{-1},
+			{3},
+		},
+		out: [][]float64{
+			{1},
+			{7},
+			{14},
+		},
+		sum: [][]float64{
+			{1},
+			{7},
+			{14},
+		},
+		weights: [][]float64{
+			{2, 4, 3, 4},
+			{3, 2, 2, 3},
+			{3, 1, -2, 3},
+		},
+	},
+	{
+		actFn: "binary_step",
+		in: [][]float64{
+			{2},
+			{-3},
+			{-1},
+			{6},
+		},
+		out: [][]float64{
+			{1},
+			{0},
+			{1},
+		},
+		sum: [][]float64{
+			{13},
+			{-32},
+			{11},
+		},
+		weights: [][]float64{
+			{2, 4, 3, 4},
+			{-3, 2, 2, -3},
+			{-3, 1, -2, 3},
+		},
+	},
+	{
+		actFn: "relu",
+		in: [][]float64{
+			{2},
+			{-3},
+			{-1},
+			{6},
+		},
+		out: [][]float64{
+			{13},
+			{0},
+			{11},
+		},
+		sum: [][]float64{
+			{13},
+			{-32},
+			{11},
+		},
+		weights: [][]float64{
+			{2, 4, 3, 4},
+			{-3, 2, 2, -3},
+			{-3, 1, -2, 3},
+		},
+	},
+	{
+		actFn: "relu",
+		in: [][]float64{
+			{-52},
+			{-3},
+			{-1},
+			{-233},
+		},
+		out: [][]float64{
+			{0},
+			{0},
+			{0},
+		},
+		sum: [][]float64{
+			{-1051},
+			{-827},
+			{-856},
+		},
+		weights: [][]float64{
+			{2, 4, 3, 4},
+			{3, -2, -22, 3},
+			{3, 1, -2, 3},
+		},
+	},
+	{
+		actFn: "binary_step",
+		in: [][]float64{
+			{2},
+			{-3},
+			{-1},
+			{3},
+		},
+		out: [][]float64{
+			{1},
+			{1},
+			{1},
+		},
+		sum: [][]float64{
+			{1},
+			{21},
+			{752},
+		},
+		weights: [][]float64{
+			{2, 4, 3, 4},
+			{3, 2, -12, 3},
+			{333, -31, -2, -3},
+		},
+	},
 }
 
 var layersTest = []layerTestStruct{

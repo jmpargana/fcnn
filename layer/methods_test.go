@@ -1,6 +1,7 @@
 package layer
 
 import (
+	_ "fmt"
 	"github.com/jmpargana/matrix"
 	"testing"
 )
@@ -32,5 +33,28 @@ func TestForwPropInvalidInput2(t *testing.T) {
 }
 
 func TestForwProp(t *testing.T) {
+	for _, fp := range forwPropsTest {
+		layer, err := New(fp.actFn, len(fp.in), len(fp.out))
+		if err != nil {
+			t.Errorf("shouldn't fail here: %v", err)
+		}
 
+		in, sum, out := matrix.NewFrom(fp.in), matrix.NewFrom(fp.sum), matrix.NewFrom(fp.out)
+
+		weights := matrix.NewFrom(fp.weights)
+		layer.weights = weights
+
+		got, err := layer.ForwProp(in)
+		if err != nil {
+			t.Errorf("failed in forward propagation: %v", err)
+		}
+
+		if !layer.sum.Equal(sum) {
+			t.Errorf("\n%vsum matrix should be equal to\n%v", layer.sum, sum)
+		}
+
+		if !got.Equal(out) {
+			t.Errorf("\n%vshould be equal to\n%v", got, out)
+		}
+	}
 }
