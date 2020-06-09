@@ -1,9 +1,16 @@
 package layer
 
+import "github.com/jmpargana/matrix"
+
 type layerTestStruct struct {
 	actFn   string
 	inSize  int
 	outSize int
+}
+
+type forwPropsTestStruct struct {
+	actFn                 string
+	in, out, sum, weights matrix.Matrix
 }
 
 var layersTest = []layerTestStruct{

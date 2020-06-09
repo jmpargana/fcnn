@@ -10,7 +10,7 @@ import (
 // sequentially and calculates the output saving each stage in the sum and
 // output variables, which are needed for the BackProp method.
 func (l *Layer) ForwProp(input matrix.Matrix) (matrix.Matrix, error) {
-	if input.NumRows != l.inSize() {
+	if input.NumRows != l.inSize() || input.NumCols != 1 {
 		return matrix.Matrix{}, errors.New("can't perform forward propagation with invalid input size")
 	}
 
