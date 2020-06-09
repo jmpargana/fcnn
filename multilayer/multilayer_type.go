@@ -9,4 +9,5 @@ type MultiLayerPerceptron struct {
 	hiddenLayers         []layer.Layer
 	outputLayer          layer.Layer
 	batchSize, epochSize int
+	learningRate         float64
 }
