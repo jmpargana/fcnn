@@ -17,8 +17,8 @@ func New(actFn string, inSize, outSize int) (Layer, error) {
 		return Layer{}, errors.New(fmt.Sprintf("%s is not available as activation function", actFn))
 	}
 
-	if inSize < 1 {
-		return Layer{}, errors.New("input size needs to be 1 or bigger")
+	if inSize < 1 || outSize < 1 {
+		return Layer{}, errors.New(fmt.Sprintf("that would be an invalid size for a matrix: %dx%d", inSize, outSize))
 	}
 
 	weights := matrix.NewRandom(inSize, outSize)
