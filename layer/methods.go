@@ -25,5 +25,20 @@ func (l *Layer) ForwProp(input matrix.Matrix) (matrix.Matrix, error) {
 
 // TODO: implement
 func (l *Layer) BackProp(loss matrix.Matrix) (matrix.Matrix, error) {
-	return matrix.Matrix{}, nil
+
+	derivative, _ := DerivativeFunctions[l.actFn](l.sum)
+
+	// in order to prevent allocation everytime this functions is called
+	// maybe it would be clever to allocate in the constructor
+	transposedWeights, err := matrix.Trans(l.weights)
+	if err != nil {
+		return matrix.Matrix{}, err
+	}
+
+	delta, err := matrix.Mult(transposedWeights, derivative)
+	if err != nil {
+		return matrix.Matrix{}, err
+	}
+
+	return delta, nil
 }
