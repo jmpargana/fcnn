@@ -2,7 +2,7 @@ package layer
 
 import (
 	"errors"
-	"github.com/jmpargana/fcnn"
+
 	"github.com/jmpargana/matrix"
 )
 
@@ -14,16 +14,11 @@ func (l *Layer) ForwProp(input matrix.Matrix) (matrix.Matrix, error) {
 		return matrix.Matrix{}, errors.New("can't perform forward propagation with invalid input size")
 	}
 
-	var err error
-	l.sum, err = matrix.Mult(l.weights, input)
-	if err != nil {
+	l.sum, _ = matrix.Mult(l.weights, input)
+	if err := l.sum.Add(l.bias); err != nil {
 		return matrix.Matrix{}, err
 	}
-
-	l.output, err = fcnn.ActivationFunctions[l.actFn](l.sum)
-	if err != nil {
-		return matrix.Matrix{}, err
-	}
+	l.output, _ = ActivationFunctions[l.actFn](l.sum)
 
 	return l.output, nil
 }

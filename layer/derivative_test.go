@@ -1,9 +1,10 @@
-package fcnn
+package layer
 
 import (
 	"fmt"
-	"github.com/jmpargana/matrix"
 	"testing"
+
+	"github.com/jmpargana/matrix"
 )
 
 func TestDIdentity(t *testing.T) {

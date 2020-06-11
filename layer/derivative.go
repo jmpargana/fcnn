@@ -1,9 +1,10 @@
-package fcnn
+package layer
 
 import (
-	. "github.com/jmpargana/matrix"
 	"math"
 	"math/rand"
+
+	"github.com/jmpargana/matrix"
 )
 
 // DerivativeFunctions is a map of the derivatives of the available activation functions.
@@ -20,12 +21,12 @@ var DerivativeFunctions = map[string]fnType{
 	"softmax":     dSoftmax,
 }
 
-func dIdentity(in Matrix) (m Matrix, err error) {
+func dIdentity(in matrix.Matrix) (m matrix.Matrix, err error) {
 	m, err = apply(in, func(x float64) float64 { return 1 })
 	return
 }
 
-func dRelu(in Matrix) (m Matrix, err error) {
+func dRelu(in matrix.Matrix) (m matrix.Matrix, err error) {
 	m, err = apply(in, func(x float64) float64 {
 		if x <= 0 {
 			return 0
@@ -35,7 +36,7 @@ func dRelu(in Matrix) (m Matrix, err error) {
 	return
 }
 
-func dBinaryStep(in Matrix) (m Matrix, err error) {
+func dBinaryStep(in matrix.Matrix) (m matrix.Matrix, err error) {
 	m, err = apply(in, func(x float64) float64 {
 		if x != 0 {
 			return 0
@@ -46,7 +47,7 @@ func dBinaryStep(in Matrix) (m Matrix, err error) {
 	return
 }
 
-func dSigmoid(in Matrix) (m Matrix, err error) {
+func dSigmoid(in matrix.Matrix) (m matrix.Matrix, err error) {
 	m, err = apply(in, func(x float64) float64 {
 		fx := 1 / (1 + math.Exp(-x))
 		return fx * (1 - fx)
@@ -54,14 +55,14 @@ func dSigmoid(in Matrix) (m Matrix, err error) {
 	return
 }
 
-func dTanH(in Matrix) (m Matrix, err error) {
+func dTanH(in matrix.Matrix) (m matrix.Matrix, err error) {
 	m, err = apply(in, func(x float64) float64 {
 		return (math.Exp(x) - math.Exp(-x)) / (math.Exp(x) + math.Exp(-x))
 	})
 	return
 }
 
-func dLReLU(in Matrix) (m Matrix, err error) {
+func dLReLU(in matrix.Matrix) (m matrix.Matrix, err error) {
 	m, err = apply(in, func(x float64) float64 {
 		fx := x
 		if x < 0 {
@@ -72,7 +73,7 @@ func dLReLU(in Matrix) (m Matrix, err error) {
 	return
 }
 
-func dRReLU(in Matrix) (m Matrix, err error) {
+func dRReLU(in matrix.Matrix) (m matrix.Matrix, err error) {
 	m, err = apply(in, func(x float64) float64 {
 		alpha := rand.Float64()
 		if x < 0 {
@@ -83,7 +84,7 @@ func dRReLU(in Matrix) (m Matrix, err error) {
 	return
 }
 
-func dArcTan(in Matrix) (m Matrix, err error) {
+func dArcTan(in matrix.Matrix) (m matrix.Matrix, err error) {
 	m, err = apply(in, func(x float64) float64 {
 		return 1 / (x*x + 1)
 	})
@@ -91,6 +92,6 @@ func dArcTan(in Matrix) (m Matrix, err error) {
 }
 
 // TODO: implement
-func dSoftmax(in Matrix) (Matrix, error) {
-	return Matrix{}, nil
+func dSoftmax(in matrix.Matrix) (matrix.Matrix, error) {
+	return matrix.Matrix{}, nil
 }

@@ -1,8 +1,9 @@
-package fcnn
+package layer
 
 import (
-	"github.com/jmpargana/matrix"
 	"testing"
+
+	"github.com/jmpargana/matrix"
 )
 
 func TestAvailableFn(t *testing.T) {

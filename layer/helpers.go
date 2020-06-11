@@ -1,4 +1,4 @@
-package fcnn
+package layer
 
 import "github.com/jmpargana/matrix"
 

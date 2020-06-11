@@ -3,7 +3,7 @@ package layer
 import (
 	"errors"
 	"fmt"
-	"github.com/jmpargana/fcnn"
+
 	"github.com/jmpargana/matrix"
 )
 
@@ -12,8 +12,9 @@ import (
 // the sum and output vectors.
 // It checks weather the input size is valid and if the activation
 // function exists in map.
+// The bias is activated with a 0 vector.
 func New(actFn string, inSize, outSize int) (Layer, error) {
-	if _, ok := fcnn.ActivationFunctions[actFn]; !ok {
+	if _, ok := ActivationFunctions[actFn]; !ok {
 		return Layer{}, errors.New(fmt.Sprintf("%s is not available as activation function", actFn))
 	}
 
@@ -22,12 +23,13 @@ func New(actFn string, inSize, outSize int) (Layer, error) {
 	}
 
 	weights := matrix.NewRandom(outSize, inSize)
-	output, sum := matrix.New(outSize, 1), matrix.New(outSize, 1)
+	output, sum, bias := matrix.New(outSize, 1), matrix.New(outSize, 1), matrix.New(outSize, 1)
 
 	return Layer{
 		actFn:   actFn,
 		weights: weights,
 		output:  output,
 		sum:     sum,
+		bias:    bias,
 	}, nil
 }

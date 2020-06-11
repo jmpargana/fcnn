@@ -8,6 +8,6 @@ import "github.com/jmpargana/matrix"
 // The output and sum matrices will store the vector calculated
 // in the ForwProp needed for the BackProp.
 type Layer struct {
-	actFn                string
-	weights, output, sum matrix.Matrix
+	actFn                      string
+	weights, output, sum, bias matrix.Matrix
 }
