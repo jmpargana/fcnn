@@ -3,8 +3,10 @@ package fcnn
 import (
 	// "encoding/json"
 	"errors"
-	"github.com/jmpargana/fcnn/layer"
 	"os"
+
+	"github.com/jmpargana/fcnn/layer"
+	"github.com/jmpargana/matrix"
 )
 
 func New(hiddenLayers []int,
@@ -33,12 +35,19 @@ func New(hiddenLayers []int,
 		return MultiLayerPerceptron{}, err
 	}
 
+	activations := make([]matrix.Matrix, len(hiddenLayers))
+	weights := make([]matrix.Matrix, len(hiddenLayers))
+	deltas := make([]matrix.Matrix, len(hiddenLayers))
+
 	return MultiLayerPerceptron{
 		hiddenLayers: hLayers,
 		outputLayer:  oLayer,
 		batchSize:    batchSize,
 		epochSize:    epochSize,
 		learningRate: learningRate,
+		activations:  activations,
+		weights:      weights,
+		deltas:       deltas,
 	}, nil
 }
 
