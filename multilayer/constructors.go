@@ -35,7 +35,6 @@ func New(hiddenLayers []int,
 		return MultiLayerPerceptron{}, err
 	}
 
-	activations := make([]matrix.Matrix, len(hiddenLayers))
 	weights := make([]matrix.Matrix, len(hiddenLayers))
 	deltas := make([]matrix.Matrix, len(hiddenLayers))
 
@@ -45,7 +44,6 @@ func New(hiddenLayers []int,
 		batchSize:    batchSize,
 		epochSize:    epochSize,
 		learningRate: learningRate,
-		activations:  activations,
 		weights:      weights,
 		deltas:       deltas,
 	}, nil

@@ -9,15 +9,13 @@ import (
 // It returns an output vector which gets compared with the expected value.
 func (m *MultiLayerPerceptron) ForwProp(in matrix.Matrix) (matrix.Matrix, error) {
 
-	for i, layer := range m.hiddenLayers {
+	for _, layer := range m.hiddenLayers {
 
 		var err error
 		in, err = layer.ForwProp(in)
 		if err != nil {
 			return matrix.Matrix{}, err
 		}
-
-		m.activations[i] = in
 	}
 
 	// Maybe output layer should be part of the same slice of layers from
@@ -27,11 +25,13 @@ func (m *MultiLayerPerceptron) ForwProp(in matrix.Matrix) (matrix.Matrix, error)
 		return matrix.Matrix{}, err
 	}
 
-	m.activations[len(m.hiddenLayers)] = in
-
 	return in, nil
 }
 
+// BackProp receives an expected output Y, calculates the first delta
+// using the quadratic function (might generalize later).
+// It then propagates the error further saving the weight and bias errors
+// indexing in the member attributes for later use with the Gradient Descent.
 func (m *MultiLayerPerceptron) BackProp(output matrix.Matrix) error {
 
 	for i := len(m.deltas) - 1; i > 1; i-- {
@@ -50,6 +50,9 @@ func (m *MultiLayerPerceptron) BackProp(output matrix.Matrix) error {
 	return nil
 }
 
+// calculateDelta receives an error vector and calculates the error of each
+// layer. Uses the quadratic function for the outputLayer and normal weight
+// transposing for all others.
 func (m *MultiLayerPerceptron) calculateDelta(index int, output matrix.Matrix) error {
 
 	var delta matrix.Matrix
@@ -58,7 +61,10 @@ func (m *MultiLayerPerceptron) calculateDelta(index int, output matrix.Matrix) e
 	if index == len(m.deltas)-1 {
 		delta, err = m.outputLayer.BackPropOutLayer(output)
 	} else {
-		delta, err = m.hiddenLayers[index].BackProp(m.deltas[index+1])
+		// TODO: need to check one extra for output layer
+		delta, err = m.hiddenLayers[index].BackProp(
+			m.deltas[index+1],
+			m.hiddenLayers[index+2].Weights)
 	}
 
 	if err != nil {
@@ -70,9 +76,13 @@ func (m *MultiLayerPerceptron) calculateDelta(index int, output matrix.Matrix) e
 	return nil
 }
 
+// calculateWeight multiplies the previous activatedOutput with the current error
+// generating a matrix of weights' errors.
 func (m *MultiLayerPerceptron) calculateWeight(index int) error {
 
-	transposedPrevAct, err := matrix.Trans(m.activations[index-1])
+	// TODO: check for indices in hidden and output layers
+	transposedPrevAct, err := matrix.Trans(m.hiddenLayers[index-1].Output)
+	// transposedPrevAct, err := matrix.Trans(m.activations[index-1])
 	if err != nil {
 		return err
 	}
@@ -86,6 +96,10 @@ func (m *MultiLayerPerceptron) calculateWeight(index int) error {
 	return nil
 }
 
+// GradientDescent is called after calculating the errors for both the bias and
+// weights in each layer. It then sequentially updates both. It does so calling
+// the method in each layer which simply subtracts the multiplyed error and learning
+// rate from the current value.
 func (m *MultiLayerPerceptron) GradientDescent() error {
 
 	for i, layer := range m.hiddenLayers {

@@ -14,27 +14,24 @@ func (l *Layer) ForwProp(input matrix.Matrix) (matrix.Matrix, error) {
 		return matrix.Matrix{}, errors.New("can't perform forward propagation with invalid input size")
 	}
 
-	l.sum, _ = matrix.Mult(l.weights, input)
+	l.sum, _ = matrix.Mult(l.Weights, input)
 	if err := l.sum.Add(l.bias); err != nil {
 		return matrix.Matrix{}, err
 	}
-	l.output, _ = ActivationFunctions[l.actFn](l.sum)
+	l.Output, _ = ActivationFunctions[l.actFn](l.sum)
 
-	return l.output, nil
+	return l.Output, nil
 }
 
 // BackProp implements the backpropagation algorithm for any layer.
-// It takes the delta loss from layer (l+1) and calculates the error of
+// It takes the delta loss and weights from layer (l+1) and calculates the error of
 // the current layer.
-func (l *Layer) BackProp(loss matrix.Matrix) (matrix.Matrix, error) {
-	// in order to prevent allocation everytime this functions is called,
+func (l *Layer) BackProp(prevDelta, weights matrix.Matrix) (matrix.Matrix, error) {
+	// TODO: in order to prevent allocation everytime this functions is called,
 	// maybe it would be clever to allocate in the constructor
-	transposedWeights, err := matrix.Trans(l.weights)
-	if err != nil {
-		return matrix.Matrix{}, err
-	}
+	transposedWeights, _ := matrix.Trans(weights)
 
-	weightedErrors, err := matrix.Mult(transposedWeights, loss)
+	weightedErrors, err := matrix.Mult(transposedWeights, prevDelta)
 	if err != nil {
 		return matrix.Matrix{}, err
 	}
@@ -56,25 +53,26 @@ func (l *Layer) BackProp(loss matrix.Matrix) (matrix.Matrix, error) {
 // when generalising to any cost function.
 func (l *Layer) BackPropOutLayer(expected matrix.Matrix) (matrix.Matrix, error) {
 
-	computedError, err := matrix.Sub(l.output, expected)
+	computedError, err := matrix.Sub(l.Output, expected)
 	if err != nil {
 		return matrix.Matrix{}, err
 	}
 
+	// these two can't fail, since the dimensions are already checked before
 	derivative, _ := DerivativeFunctions[l.actFn](l.sum)
-
-	delta, err := matrix.HadamardProd(computedError, derivative)
-	if err != nil {
-		return matrix.Matrix{}, err
-	}
+	delta, _ := matrix.HadamardProd(computedError, derivative)
 
 	return delta, nil
 }
 
+// UpdateWeights receives the multiplyed learning rate and error and is subtracted
+// from the layers weight matrix.
 func (l *Layer) UpdateWeights(derived matrix.Matrix) error {
-	return l.weights.Sub(derived)
+	return l.Weights.Sub(derived)
 }
 
+// UpdateBias receives the multiplyed learning rate and error and is subtracted
+// from the layers bias vector.
 func (l *Layer) UpdateBias(derived matrix.Matrix) error {
 	return l.bias.Sub(derived)
 }

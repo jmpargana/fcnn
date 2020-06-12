@@ -27,8 +27,8 @@ func New(actFn string, inSize, outSize int) (Layer, error) {
 
 	return Layer{
 		actFn:   actFn,
-		weights: weights,
-		output:  output,
+		Weights: weights,
+		Output:  output,
 		sum:     sum,
 		bias:    bias,
 	}, nil

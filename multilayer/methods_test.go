@@ -1,8 +1,9 @@
 package fcnn
 
 import (
-	"github.com/jmpargana/matrix"
 	"testing"
+
+	"github.com/jmpargana/matrix"
 )
 
 func TestForwProp(t *testing.T) {

@@ -31,7 +31,7 @@ func dRelu(in matrix.Matrix) (m matrix.Matrix, err error) {
 		if x <= 0 {
 			return 0
 		}
-		return x
+		return 1
 	})
 	return
 }
@@ -57,18 +57,18 @@ func dSigmoid(in matrix.Matrix) (m matrix.Matrix, err error) {
 
 func dTanH(in matrix.Matrix) (m matrix.Matrix, err error) {
 	m, err = apply(in, func(x float64) float64 {
-		return (math.Exp(x) - math.Exp(-x)) / (math.Exp(x) + math.Exp(-x))
+		fx := (math.Exp(x) - math.Exp(-x)) / (math.Exp(x) + math.Exp(-x))
+		return 1 - fx*fx
 	})
 	return
 }
 
 func dLReLU(in matrix.Matrix) (m matrix.Matrix, err error) {
 	m, err = apply(in, func(x float64) float64 {
-		fx := x
 		if x < 0 {
-			fx = 0.01 * x
+			return 0.01
 		}
-		return 1 - fx*fx
+		return 1
 	})
 	return
 }

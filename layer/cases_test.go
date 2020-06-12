@@ -1,8 +1,11 @@
 package layer
 
 type actFnTest struct {
-	in  [][]float64
-	out [][]float64
+	in, out [][]float64
+}
+
+type updateTest struct {
+	in, out, exp [][]float64
 }
 
 type layerTestStruct struct {
@@ -19,6 +22,16 @@ type forwPropsTestStruct struct {
 type forwPropsWithBiasTestStruct struct {
 	actFn                       string
 	in, out, sum, weights, bias [][]float64
+}
+
+type backPropOutLayerTestStruct struct {
+	actFn                             string
+	desiredOutput, expectedDelta, sum [][]float64
+}
+
+type backPropStruct struct {
+	actFn                                       string
+	deltaPlus1, weights, prevSum, sum, expected [][]float64
 }
 
 var forwPropsWithBiasTest = []forwPropsWithBiasTestStruct{
@@ -498,7 +511,7 @@ var dReluTest = []actFnTest{
 			{1},
 			{0},
 			{0},
-			{2},
+			{1},
 		},
 	},
 	{
@@ -510,9 +523,9 @@ var dReluTest = []actFnTest{
 		},
 		[][]float64{
 			{1},
-			{2},
-			{3},
-			{2},
+			{1},
+			{1},
+			{1},
 		},
 	},
 	{
@@ -524,7 +537,7 @@ var dReluTest = []actFnTest{
 		[][]float64{
 			{0},
 			{0},
-			{20},
+			{1},
 		},
 	},
 }
@@ -580,10 +593,10 @@ var dLreluTest = []actFnTest{
 			{2},
 		},
 		[][]float64{
-			{0},
-			{0.9996},
-			{0.9999},
-			{-3},
+			{1},
+			{0.01},
+			{0.01},
+			{1},
 		},
 	},
 	{
@@ -594,10 +607,10 @@ var dLreluTest = []actFnTest{
 			{2},
 		},
 		[][]float64{
-			{0},
-			{-3},
-			{-8},
-			{-3},
+			{1},
+			{1},
+			{1},
+			{1},
 		},
 	},
 	{
@@ -607,9 +620,9 @@ var dLreluTest = []actFnTest{
 			{20},
 		},
 		[][]float64{
-			{0.9999},
-			{0.9996},
-			{-399},
+			{0.01},
+			{0.01},
+			{1},
 		},
 	},
 }
@@ -652,6 +665,544 @@ var dArcTanTest = []actFnTest{
 			{0.5},
 			{0.2},
 			{1},
+		},
+	},
+}
+
+var updateWeightsTest = []updateTest{
+	{
+		in: [][]float64{
+			{2, 3, 4, 2},
+			{2, 3, 4, 2},
+			{2, 3, 4, 2},
+		},
+		out: [][]float64{
+			{2, 3, 4, 2},
+			{2, 3, 4, 2},
+			{2, 3, 4, 2},
+		},
+		exp: [][]float64{
+			{0, 0, 0, 0},
+			{0, 0, 0, 0},
+			{0, 0, 0, 0},
+		},
+	},
+	{
+		in: [][]float64{
+			{2, 3, 2},
+			{2, 3, 2},
+			{2, 3, 2},
+		},
+		out: [][]float64{
+			{1, 1, 2},
+			{1, 1, 2},
+			{1, 1, 2},
+		},
+		exp: [][]float64{
+			{1, 2, 0},
+			{1, 2, 0},
+			{1, 2, 0},
+		},
+	},
+	{
+		in: [][]float64{
+			{2, 3, 4, 2},
+			{2, 3, 4, 2},
+		},
+		out: [][]float64{
+			{3, 3, 4, 3},
+			{3, 3, 4, 3},
+		},
+		exp: [][]float64{
+			{-1, 0, 0, -1},
+			{-1, 0, 0, -1},
+		},
+	},
+}
+
+var updateWeightsTestInvalid = []updateTest{
+	{
+		in: [][]float64{
+			{2, 3, 4, 2},
+			{2, 3, 4, 2},
+			{2, 3, 4, 2},
+		},
+		out: [][]float64{
+			{2, 3, 4, 2},
+			{2, 3, 4, 2},
+		},
+		exp: [][]float64{
+			{0, 0, 0, 0},
+			{0, 0, 0, 0},
+		},
+	},
+	{
+		in: [][]float64{
+			{2, 3},
+			{2, 3},
+			{2, 3},
+		},
+		out: [][]float64{
+			{1, 1, 2},
+			{1, 1, 2},
+			{1, 1, 2},
+		},
+		exp: [][]float64{
+			{1, 2, 0},
+			{1, 2, 0},
+			{1, 2, 0},
+		},
+	},
+	{
+		in: [][]float64{
+			{2, 3, 4, 2},
+		},
+		out: [][]float64{
+			{3, 3, 4, 3},
+			{3, 3, 4, 3},
+		},
+		exp: [][]float64{
+			{-1, 0, 0, -1},
+			{-1, 0, 0, -1},
+		},
+	},
+}
+
+var updateBiasTest = []updateTest{
+	{
+		in: [][]float64{
+			{2},
+			{2},
+			{2},
+		},
+		out: [][]float64{
+			{2},
+			{2},
+			{2},
+		},
+		exp: [][]float64{
+			{0},
+			{0},
+			{0},
+		},
+	},
+	{
+		in: [][]float64{
+			{2},
+			{1},
+			{3},
+		},
+		out: [][]float64{
+			{2},
+			{2},
+			{2},
+		},
+		exp: [][]float64{
+			{0},
+			{-1},
+			{1},
+		},
+	},
+	{
+		in: [][]float64{
+			{2},
+			{2},
+			{2},
+			{5},
+			{5},
+		},
+		out: [][]float64{
+			{2},
+			{2},
+			{2},
+			{2},
+			{2},
+		},
+		exp: [][]float64{
+			{0},
+			{0},
+			{0},
+			{3},
+			{3},
+		},
+	},
+}
+
+var updateBiasTestInvalid = []updateTest{
+	{
+		in: [][]float64{
+			{2},
+			{2},
+		},
+		out: [][]float64{
+			{2},
+			{2},
+			{2},
+		},
+		exp: [][]float64{
+			{0},
+			{0},
+			{0},
+		},
+	},
+	{
+		in: [][]float64{
+			{2},
+			{1},
+			{3},
+		},
+		out: [][]float64{
+			{2},
+			{2},
+			{2},
+			{3},
+		},
+		exp: [][]float64{
+			{0},
+			{1},
+			{-1},
+		},
+	},
+	{
+		in: [][]float64{
+			{2, 2, 3},
+			{2, 2, 3},
+			{2, 2, 3},
+			{2, 2, 3},
+			{2, 2, 3},
+		},
+		out: [][]float64{
+			{2},
+			{2},
+			{2},
+			{2},
+			{2},
+		},
+		exp: [][]float64{
+			{0},
+			{0},
+			{0},
+			{2},
+			{2},
+		},
+	},
+}
+
+var backPropOutLayerTest = []backPropOutLayerTestStruct{
+	{
+		actFn: "identity",
+		sum: [][]float64{
+			{1},
+			{4},
+			{-5},
+			{0},
+		},
+		desiredOutput: [][]float64{
+			{0},
+			{0},
+			{5},
+			{0},
+		},
+		expectedDelta: [][]float64{
+			{1},
+			{4},
+			{-10},
+			{0},
+		},
+	},
+	{
+		actFn: "binary_step",
+		sum: [][]float64{
+			{1},
+			{4},
+			{-5},
+			{0},
+			{-20},
+		},
+		desiredOutput: [][]float64{
+			{1},
+			{0},
+			{5},
+			{1},
+			{0},
+		},
+		expectedDelta: [][]float64{
+			{0},
+			{0},
+			{-0},
+			{-1},
+			{0},
+		},
+	},
+	{
+		actFn: "lrelu",
+		sum: [][]float64{
+			{2},
+			{-400},
+		},
+		desiredOutput: [][]float64{
+			{1},
+			{0},
+		},
+		expectedDelta: [][]float64{
+			{1},
+			{-0.04},
+		},
+	},
+}
+
+var backPropOutLayerInvalidTest = []backPropOutLayerTestStruct{
+	{
+		actFn: "relu",
+		sum: [][]float64{
+			{1},
+			{4},
+			{-5},
+			{0},
+			{0},
+		},
+		desiredOutput: [][]float64{
+			{1},
+			{4},
+			{-5},
+			{0},
+		},
+		expectedDelta: [][]float64{
+			{1},
+			{4},
+			{-5},
+			{0},
+		},
+	},
+	{
+		actFn: "relu",
+		sum: [][]float64{
+			{1},
+			{4},
+			{-5},
+			{0},
+		},
+		desiredOutput: [][]float64{
+			{1},
+			{4},
+			{-5},
+		},
+		expectedDelta: [][]float64{
+			{1},
+			{4},
+			{-5},
+			{0},
+		},
+	},
+	{
+		actFn: "relu",
+		sum: [][]float64{
+			{1},
+			{4},
+			{-5},
+			{0},
+			{0},
+		},
+		desiredOutput: [][]float64{
+			{1},
+			{4},
+			{-5},
+			{0},
+		},
+		expectedDelta: [][]float64{
+			{1},
+			{0},
+		},
+	},
+}
+
+var backPropTest = []backPropStruct{
+	{
+		actFn: "identity",
+		sum: [][]float64{
+			{-31},
+			{-1234},
+			{12323},
+		},
+		weights: [][]float64{
+			{1, 2, 3},
+			{1, 2, 1},
+			{1, 0, 1},
+			{1, 2, 0},
+			{1, 0, 0},
+		},
+		deltaPlus1: [][]float64{
+			{-1},
+			{2},
+			{-1},
+			{2},
+			{-1},
+		},
+		expected: [][]float64{
+			{1},
+			{6},
+			{-2},
+		},
+	},
+	{
+		actFn: "relu",
+		sum: [][]float64{
+			{-31},
+			{-1234},
+			{12323},
+		},
+		weights: [][]float64{
+			{1, 2, 3},
+			{1, 2, 1},
+			{1, 0, 1},
+			{1, 2, 0},
+			{1, 0, 0},
+		},
+		deltaPlus1: [][]float64{
+			{-1},
+			{2},
+			{-1},
+			{2},
+			{-1},
+		},
+		expected: [][]float64{
+			{0},
+			{0},
+			{-2},
+		},
+	},
+	{
+		actFn: "lrelu",
+		sum: [][]float64{
+			{-31},
+			{-1234},
+			{12323},
+		},
+		weights: [][]float64{
+			{1, 2, 3},
+			{1, 2, 1},
+			{1, 0, 1},
+			{1, 2, 0},
+			{1, 0, 0},
+		},
+		deltaPlus1: [][]float64{
+			{-1},
+			{2},
+			{-1},
+			{2},
+			{-1},
+		},
+		expected: [][]float64{
+			{0.01},
+			{0.06},
+			{-2},
+		},
+	},
+}
+
+var backPropTestInvalid = []backPropStruct{
+	{
+		actFn: "identity",
+		sum: [][]float64{
+			{-31},
+			{-1234},
+			{12323},
+		},
+		weights: [][]float64{
+			{1, 2, 1},
+			{1, 0, 1},
+			{1, 2, 0},
+			{1, 0, 0},
+		},
+		deltaPlus1: [][]float64{
+			{-1},
+			{2},
+			{-1},
+			{2},
+			{-1},
+		},
+		expected: [][]float64{
+			{1},
+			{6},
+			{-2},
+		},
+	},
+	{
+		actFn: "relu",
+		sum: [][]float64{
+			{-31},
+			{-1234},
+			{12323},
+		},
+		weights: [][]float64{
+			{1, 2, 3},
+			{1, 2, 1},
+			{1, 0, 1},
+			{1, 2, 0},
+		},
+		deltaPlus1: [][]float64{
+			{-1},
+			{2},
+			{-1},
+			{2},
+			{-1},
+		},
+		expected: [][]float64{
+			{0},
+			{0},
+			{-2},
+		},
+	},
+	{
+		actFn: "lrelu",
+		sum: [][]float64{
+			{-31},
+			{-1234},
+			{12323},
+		},
+		weights: [][]float64{
+			{1, 2, 3},
+			{1, 2, 1},
+			{1, 0, 1},
+			{1, 2, 0},
+			{1, 0, 0},
+		},
+		deltaPlus1: [][]float64{
+			{-1},
+			{2},
+			{-1},
+			{2},
+		},
+		expected: [][]float64{
+			{0.01},
+			{0.06},
+			{-2},
+		},
+	},
+	{
+		actFn: "lrelu",
+		sum: [][]float64{
+			{-31},
+			{-1234},
+		},
+		weights: [][]float64{
+			{1, 2, 3},
+			{1, 2, 1},
+			{1, 0, 1},
+			{1, 2, 0},
+			{1, 0, 0},
+		},
+		deltaPlus1: [][]float64{
+			{-1},
+			{2},
+			{-1},
+			{2},
+			{2},
+		},
+		expected: [][]float64{
+			{0.01},
+			{0.06},
+			{-2},
 		},
 	},
 }
