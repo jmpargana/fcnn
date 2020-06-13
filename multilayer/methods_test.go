@@ -205,7 +205,7 @@ func TestUpdateWeights(t *testing.T) {
 			t.Errorf("shouldn't fail here: %v", err)
 		}
 
-		if !expected.Equal(nn.hiddenLayers[index].Bias) {
+		if !expected.Equal(nn.hiddenLayers[index].Weights) {
 			t.Errorf("\n\nweight:\n%v\ndelta weights:\n%v\nmultiplyed by learning rate:%f\nshould be:\n%v\ngot:\n%v", delta, weight, test.learningRate, expected, nn.hiddenLayers[index].Weights)
 		}
 	}
