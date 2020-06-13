@@ -95,7 +95,7 @@ func TestCalculateDeltaOut(t *testing.T) {
 			t.Errorf("not supposed to fail here: %v", err)
 		}
 
-		if !matrix.Equal(expected, nn.deltas[1]) {
+		if !nn.deltas[1].Equal(expected) {
 			t.Errorf("received:\n%v\nhad sum:\n%v\nand output:\n%v\ngot:\n%v\nexpected:\n%v\n", output, sum, nn.outputLayer.Output, nn.deltas[1], expected)
 		}
 	}

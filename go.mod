@@ -2,4 +2,4 @@ module github.com/jmpargana/fcnn
 
 go 1.14
 
-require github.com/jmpargana/matrix v0.0.0-20200613143029-1087b39dbbc0
+require github.com/jmpargana/matrix v0.0.0-20200613160523-c7d0c073195f

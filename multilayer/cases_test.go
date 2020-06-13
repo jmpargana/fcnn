@@ -82,6 +82,7 @@ var deltaOutTest = []deltaOutStruct{
 			{0},
 		},
 	},
+	// this test doesnt work because 0.285 != 0.285...
 	// {
 	// 	actFn: "lrelu",
 	// 	output: [][]float64{
