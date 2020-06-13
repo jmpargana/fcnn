@@ -15,7 +15,7 @@ func (l *Layer) ForwProp(input matrix.Matrix) (matrix.Matrix, error) {
 	}
 
 	l.Sum, _ = matrix.Mult(l.Weights, input)
-	if err := l.Sum.Add(l.bias); err != nil {
+	if err := l.Sum.Add(l.Bias); err != nil {
 		return matrix.Matrix{}, err
 	}
 	l.Output, _ = ActivationFunctions[l.actFn](l.Sum)
@@ -74,5 +74,5 @@ func (l *Layer) UpdateWeights(derived matrix.Matrix) error {
 // UpdateBias receives the multiplyed learning rate and error and is subtracted
 // from the layers bias vector.
 func (l *Layer) UpdateBias(derived matrix.Matrix) error {
-	return l.bias.Sub(derived)
+	return l.Bias.Sub(derived)
 }

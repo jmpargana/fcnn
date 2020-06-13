@@ -30,6 +30,6 @@ func New(actFn string, inSize, outSize int) (Layer, error) {
 		Weights: weights,
 		Output:  output,
 		Sum:     sum,
-		bias:    bias,
+		Bias:    bias,
 	}, nil
 }

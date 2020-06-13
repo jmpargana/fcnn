@@ -71,7 +71,7 @@ func TestForwPropWithBias(t *testing.T) {
 
 		weights := matrix.NewFrom(fp.weights)
 		layer.Weights = weights
-		layer.bias = bias
+		layer.Bias = bias
 
 		got, err := layer.ForwProp(in)
 		if err != nil {
@@ -109,7 +109,7 @@ func TestForwPropInvalidBias2(t *testing.T) {
 	}
 
 	in := matrix.New(20, 1)
-	layer.bias = matrix.New(15, 15)
+	layer.Bias = matrix.New(15, 15)
 
 	if _, err = layer.ForwProp(in); err == nil {
 		t.Errorf("non matching input size and weights")
@@ -168,14 +168,14 @@ func TestUpdateBias(t *testing.T) {
 			t.Errorf("shouldn't fail here: %v", err)
 		}
 
-		layer.bias = bias
+		layer.Bias = bias
 
 		if err := layer.UpdateBias(derivedError); err != nil {
 			t.Errorf("shoudln't fail here: %v", err)
 		}
 
-		if !layer.bias.Equal(expected) {
-			t.Errorf("\nbias:\n%vminus derived error:\n%vshould equal:\n%vinstead got:\n%v", bias, derivedError, expected, layer.bias)
+		if !layer.Bias.Equal(expected) {
+			t.Errorf("\nbias:\n%vminus derived error:\n%vshould equal:\n%vinstead got:\n%v", bias, derivedError, expected, layer.Bias)
 		}
 	}
 }
@@ -190,7 +190,7 @@ func TestUpdateBiasInvalid(t *testing.T) {
 			t.Errorf("shouldn't fail here: %v", err)
 		}
 
-		layer.bias = bias
+		layer.Bias = bias
 
 		if err := layer.UpdateBias(derivedError); err == nil {
 			t.Errorf("not supposed to be able to subtract %v from %v", derivedError, bias)

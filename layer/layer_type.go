@@ -9,5 +9,5 @@ import "github.com/jmpargana/matrix"
 // in the ForwProp needed for the BackProp.
 type Layer struct {
 	actFn                      string
-	Weights, Output, Sum, bias matrix.Matrix
+	Weights, Output, Sum, Bias matrix.Matrix
 }

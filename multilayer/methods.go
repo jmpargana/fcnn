@@ -146,6 +146,7 @@ func (m *MultiLayerPerceptron) updateWeight(index int, goErr chan error) {
 // or one of the hidden ones by calling the method of the type with the error that needs to
 // be subtracted.
 func (m *MultiLayerPerceptron) updateBias(index int, goErr chan error) {
+
 	m.deltas[index].MultScalar(m.learningRate)
 	var err error
 
