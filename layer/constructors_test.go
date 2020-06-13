@@ -11,15 +11,15 @@ func TestNewLayer(t *testing.T) {
 			t.Errorf("something went wrong: %v", err)
 		}
 
-		if layer.sum.NumCols != 1 || layer.Output.NumCols != 1 {
+		if layer.Sum.NumCols != 1 || layer.Output.NumCols != 1 {
 			t.Errorf("the sum and output matrices should be vectors")
 		}
 
-		if layer.sum.NumRows != layer.Output.NumRows {
+		if layer.Sum.NumRows != layer.Output.NumRows {
 			t.Errorf("sum and output vector should have the same size")
 		}
 
-		if layer.sum.NumRows != layer.Weights.NumRows {
+		if layer.Sum.NumRows != layer.Weights.NumRows {
 			t.Errorf("sum and weight matrix should have the matching sizes")
 		}
 	}

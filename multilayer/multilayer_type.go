@@ -14,4 +14,5 @@ type MultiLayerPerceptron struct {
 	batchSize, epochSize int
 	learningRate         float64
 	deltas, weights      []matrix.Matrix
+	lastInput            matrix.Matrix
 }

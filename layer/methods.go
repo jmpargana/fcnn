@@ -14,11 +14,11 @@ func (l *Layer) ForwProp(input matrix.Matrix) (matrix.Matrix, error) {
 		return matrix.Matrix{}, errors.New("can't perform forward propagation with invalid input size")
 	}
 
-	l.sum, _ = matrix.Mult(l.Weights, input)
-	if err := l.sum.Add(l.bias); err != nil {
+	l.Sum, _ = matrix.Mult(l.Weights, input)
+	if err := l.Sum.Add(l.bias); err != nil {
 		return matrix.Matrix{}, err
 	}
-	l.Output, _ = ActivationFunctions[l.actFn](l.sum)
+	l.Output, _ = ActivationFunctions[l.actFn](l.Sum)
 
 	return l.Output, nil
 }
@@ -36,7 +36,7 @@ func (l *Layer) BackProp(prevDelta, weights matrix.Matrix) (matrix.Matrix, error
 		return matrix.Matrix{}, err
 	}
 
-	derivative, _ := DerivativeFunctions[l.actFn](l.sum)
+	derivative, _ := DerivativeFunctions[l.actFn](l.Sum)
 
 	delta, err := matrix.HadamardProd(weightedErrors, derivative)
 	if err != nil {
@@ -59,7 +59,7 @@ func (l *Layer) BackPropOutLayer(expected matrix.Matrix) (matrix.Matrix, error) 
 	}
 
 	// these two can't fail, since the dimensions are already checked before
-	derivative, _ := DerivativeFunctions[l.actFn](l.sum)
+	derivative, _ := DerivativeFunctions[l.actFn](l.Sum)
 	delta, _ := matrix.HadamardProd(computedError, derivative)
 
 	return delta, nil

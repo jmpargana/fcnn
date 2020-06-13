@@ -27,6 +27,13 @@ func TestHiddenLayers(t *testing.T) {
 	}
 }
 
+func TestInvalidNewForZeroHiddenLayers(t *testing.T) {
+	_, err := New([]int{1}, 1, "relu", "relu", 1, 1, 0.5)
+	if err == nil {
+		t.Errorf("need at least 1 hidden layer, otherwise act function for hidden layer doesn't make sense")
+	}
+}
+
 func TestInvalidHiddenLayers(t *testing.T) {
 	for _, hl := range invalidHiddenLayersTest {
 		_, err := startHiddenLayers("relu", hl)

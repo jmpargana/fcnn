@@ -50,8 +50,8 @@ func TestForwProp(t *testing.T) {
 			t.Errorf("failed in forward propagation: %v", err)
 		}
 
-		if !layer.sum.Equal(sum) {
-			t.Errorf("\n%vsum matrix should be equal to\n%v", layer.sum, sum)
+		if !layer.Sum.Equal(sum) {
+			t.Errorf("\n%vsum matrix should be equal to\n%v", layer.Sum, sum)
 		}
 
 		if !got.Equal(out) {
@@ -78,8 +78,8 @@ func TestForwPropWithBias(t *testing.T) {
 			t.Errorf("failed in forward propagation: %v", err)
 		}
 
-		if !layer.sum.Equal(sum) {
-			t.Errorf("\n%vsum matrix should be equal to\n%v", layer.sum, sum)
+		if !layer.Sum.Equal(sum) {
+			t.Errorf("\n%vsum matrix should be equal to\n%v", layer.Sum, sum)
 		}
 
 		if !got.Equal(out) {
@@ -205,8 +205,8 @@ func TestBackPropOutLayer(t *testing.T) {
 		sum := matrix.NewFrom(test.sum)
 
 		layer, _ := New(test.actFn, 1, 1)
-		layer.sum = sum
-		layer.Output, _ = ActivationFunctions[test.actFn](layer.sum)
+		layer.Sum = sum
+		layer.Output, _ = ActivationFunctions[test.actFn](layer.Sum)
 
 		delta, err := layer.BackPropOutLayer(desiredOutput)
 		if err != nil {
@@ -225,7 +225,7 @@ func TestBackPropOutLayerInvalid(t *testing.T) {
 		sum := matrix.NewFrom(test.sum)
 
 		layer, _ := New(test.actFn, 1, 1)
-		layer.sum = sum
+		layer.Sum = sum
 
 		if _, err := layer.BackPropOutLayer(desiredOutput); err == nil {
 			t.Errorf("should fail here")
@@ -245,7 +245,7 @@ func TestBackProp(t *testing.T) {
 			t.Errorf("shouldn't be failing here")
 		}
 
-		layer.sum = sum
+		layer.Sum = sum
 
 		got, err := layer.BackProp(deltaPlus1, weights)
 		if err != nil {
@@ -269,7 +269,7 @@ func TestBackPropInvalid(t *testing.T) {
 			t.Errorf("shouldn't be failing here")
 		}
 
-		layer.sum = sum
+		layer.Sum = sum
 
 		if _, err := layer.BackProp(deltaPlus1, weights); err == nil {
 			t.Errorf("was supposed to fail here")

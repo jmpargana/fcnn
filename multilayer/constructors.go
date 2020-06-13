@@ -9,6 +9,12 @@ import (
 	"github.com/jmpargana/matrix"
 )
 
+// New instantiates a Fully Connected Neural Network or MultiLayerPerceptron.
+// It receives a slice of in/out sizes for each hidden layer and an out size
+// for the output layer. So ([1, 2, 3], 4) would mean 2 hidden layers and 1
+// in/output with the respective sizes: 1->2, 2->3, 3->4.
+// New also receives the activation functions for the hidden and output layers
+// as well as a batch, epoch size and a learning rate.
 func New(hiddenLayers []int,
 	outputLayer int,
 	hiddenActFn,
@@ -35,8 +41,11 @@ func New(hiddenLayers []int,
 		return MultiLayerPerceptron{}, err
 	}
 
+	// since the hidden layers already contains in and out sizes it has the
+	// same length as counting with the output layer
 	weights := make([]matrix.Matrix, len(hiddenLayers))
 	deltas := make([]matrix.Matrix, len(hiddenLayers))
+	lastInput := matrix.New(hiddenLayers[0], 1)
 
 	return MultiLayerPerceptron{
 		hiddenLayers: hLayers,
@@ -46,14 +55,15 @@ func New(hiddenLayers []int,
 		learningRate: learningRate,
 		weights:      weights,
 		deltas:       deltas,
+		lastInput:    lastInput,
 	}, nil
 }
 
 // startHiddeLayers is a helper function to seperate concerns and make it
 // easier to unittest every single part of the code that might fail.
 func startHiddenLayers(hiddenActFn string, hiddenLayers []int) ([]layer.Layer, error) {
-	if len(hiddenLayers) < 1 {
-		return nil, errors.New("at least one hidden layer is needed")
+	if len(hiddenLayers) < 2 {
+		return nil, errors.New("at least one hidden layer is needed, only input size provided")
 	}
 
 	hLayers := make([]layer.Layer, 0, len(hiddenLayers)-1)

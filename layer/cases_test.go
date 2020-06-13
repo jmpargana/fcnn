@@ -34,6 +34,11 @@ type backPropStruct struct {
 	deltaPlus1, weights, prevSum, sum, expected [][]float64
 }
 
+type deltaOutStruct struct {
+	actFn                 string
+	output, expected, sum [][]float64
+}
+
 var forwPropsWithBiasTest = []forwPropsWithBiasTestStruct{
 	{
 		actFn: "identity",
@@ -1203,6 +1208,33 @@ var backPropTestInvalid = []backPropStruct{
 			{0.01},
 			{0.06},
 			{-2},
+		},
+	},
+}
+
+var deltaOutTest = []deltaOutStruct{
+	{
+		actFn: "identity",
+		output: [][]float64{
+			{0},
+			{0},
+			{1},
+			{0},
+			{0},
+		},
+		sum: [][]float64{
+			{1},
+			{2},
+			{3},
+			{4},
+			{5},
+		},
+		expected: [][]float64{
+			{1},
+			{2},
+			{2},
+			{4},
+			{5},
 		},
 	},
 }

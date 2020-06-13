@@ -6,3 +6,5 @@ github.com/jmpargana/matrix v0.0.0-20200609103046-2be02fbfd028 h1:o1CJ63ea2zC42z
 github.com/jmpargana/matrix v0.0.0-20200609103046-2be02fbfd028/go.mod h1:cP+fH2F/EOWYgckJbJyGxy/G12k8U2AhZUXnUUL54qA=
 github.com/jmpargana/matrix v0.0.0-20200611160705-bcc80cd3397e h1:2cDm6NrZIXlv2a2wXhXAwHGiz82wVrL+ATSkkIN/zzs=
 github.com/jmpargana/matrix v0.0.0-20200611160705-bcc80cd3397e/go.mod h1:cP+fH2F/EOWYgckJbJyGxy/G12k8U2AhZUXnUUL54qA=
+github.com/jmpargana/matrix v0.0.0-20200613101416-e67638e7adf0 h1:frcfMtjgxpT6gwSGpG9DEfF8cOUwJGfS86WrJ8ZGwX8=
+github.com/jmpargana/matrix v0.0.0-20200613101416-e67638e7adf0/go.mod h1:cP+fH2F/EOWYgckJbJyGxy/G12k8U2AhZUXnUUL54qA=
