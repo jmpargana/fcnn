@@ -288,8 +288,9 @@ func TestCalculateWeight(t *testing.T) {
 		nn.hiddenLayers[index-1].Output = prevOut
 
 		goErr := make(chan error)
-
-		go nn.calculateWeight(index, goErr)
+		wg := new(sync.WaitGroup)
+		wg.Add(1)
+		go nn.calculateWeight(index, goErr, wg)
 
 		err := <-goErr
 		if err != nil {
@@ -314,8 +315,9 @@ func TestCalculateWeightFirst(t *testing.T) {
 		nn.lastInput = prevOut
 
 		goErr := make(chan error)
-
-		go nn.calculateWeight(0, goErr)
+		wg := new(sync.WaitGroup)
+		wg.Add(1)
+		go nn.calculateWeight(0, goErr, wg)
 
 		err := <-goErr
 		if err != nil {
@@ -340,8 +342,9 @@ func TestInvalidCalculateWeight(t *testing.T) {
 		nn.hiddenLayers[index-1].Output = prevOut
 
 		goErr := make(chan error)
-
-		go nn.calculateWeight(0, goErr)
+		wg := new(sync.WaitGroup)
+		wg.Add(1)
+		go nn.calculateWeight(0, goErr, wg)
 
 		err := <-goErr
 		if err == nil {
