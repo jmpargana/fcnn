@@ -33,16 +33,29 @@ func (m *MultiLayerPerceptron) ForwProp(in matrix.Matrix) (matrix.Matrix, error)
 func (m *MultiLayerPerceptron) BackProp(output matrix.Matrix) error {
 
 	goroutineErr := make(chan error)
+	wgBackPropDone := make(chan struct{})
+	wgBackProp := new(sync.WaitGroup)
 
 	for i := len(m.deltas) - 1; i > 1; i-- {
 		if err := m.calculateDelta(i, output); err != nil {
 			return err
 		}
-		go m.calculateWeight(i, goroutineErr)
+		wgBackProp.Add(1)
+		go m.calculateWeight(i, goroutineErr, wgBackProp)
 	}
 
-	for err := range goroutineErr {
+	go func() {
+		wgBackProp.Wait()
+		close(wgBackPropDone)
+	}()
+
+	select {
+	case <-wgBackPropDone:
+		close(goroutineErr) // close just to be safe
+		break
+	case err := <-goroutineErr:
 		if err != nil {
+			close(goroutineErr)
 			return err
 		}
 	}
@@ -82,7 +95,7 @@ func (m *MultiLayerPerceptron) calculateDelta(index int, output matrix.Matrix) e
 
 // calculateWeight multiplies the previous activatedOutput with the current error
 // generating a matrix of weights' errors.
-func (m *MultiLayerPerceptron) calculateWeight(index int, goroutineErr chan error) {
+func (m *MultiLayerPerceptron) calculateWeight(index int, goroutineErr chan error, wgBackProp *sync.WaitGroup) {
 	var lastInput matrix.Matrix
 
 	// this means the first layer, so we don't need the activation from the prev.
@@ -101,6 +114,7 @@ func (m *MultiLayerPerceptron) calculateWeight(index int, goroutineErr chan erro
 	m.weights[index] = weight
 
 	goroutineErr <- nil
+	wgBackProp.Done()
 }
 
 // GradientDescent is called after calculating the errors for both the bias and
@@ -111,6 +125,7 @@ func (m *MultiLayerPerceptron) GradientDescent() error {
 
 	goErrs := make(chan error) // the updating can ran concurrently, we just need to check for errors
 	wg := new(sync.WaitGroup)
+	wgDone := make(chan struct{})
 
 	for i := 0; i <= len(m.hiddenLayers); i++ {
 		wg.Add(2)
@@ -118,12 +133,22 @@ func (m *MultiLayerPerceptron) GradientDescent() error {
 		go m.updateBias(i, goErrs, wg)
 	}
 
-	wg.Wait()
-	for err := range goErrs {
+	go func() {
+		wg.Wait()
+		close(wgDone)
+	}()
+
+	// if error is received break gradient descent and inform caller
+	select {
+	case <-wgDone:
+		break
+	case err := <-goErrs:
 		if err != nil {
+			close(goErrs)
 			return err
 		}
 	}
+
 	return nil
 }
 
@@ -140,7 +165,6 @@ func (m *MultiLayerPerceptron) updateWeight(index int, goErr chan error, wg *syn
 		err = m.hiddenLayers[index].UpdateWeights(m.weights[index])
 	}
 
-	// TODO: close channel after done?
 	goErr <- err
 	wg.Done()
 }
@@ -159,7 +183,6 @@ func (m *MultiLayerPerceptron) updateBias(index int, goErr chan error, wg *sync.
 		err = m.hiddenLayers[index].UpdateBias(m.deltas[index])
 	}
 
-	// TODO: close channel after done?
 	goErr <- err
 	wg.Done()
 }
