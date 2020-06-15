@@ -1,6 +1,8 @@
 package fcnn
 
 import (
+	"sync"
+
 	"github.com/jmpargana/matrix"
 )
 
@@ -81,21 +83,16 @@ func (m *MultiLayerPerceptron) calculateDelta(index int, output matrix.Matrix) e
 // calculateWeight multiplies the previous activatedOutput with the current error
 // generating a matrix of weights' errors.
 func (m *MultiLayerPerceptron) calculateWeight(index int, goroutineErr chan error) {
-
-	var transposedPrevAct matrix.Matrix
-	var err error
+	var lastInput matrix.Matrix
 
 	// this means the first layer, so we don't need the activation from the prev.
 	// instead we use the input used for the feedforward
 	if index == 0 {
-		transposedPrevAct, err = matrix.Trans(m.lastInput)
+		lastInput = m.lastInput
 	} else {
-		transposedPrevAct, err = matrix.Trans(m.hiddenLayers[index-1].Output)
+		lastInput = m.hiddenLayers[index-1].Output
 	}
-
-	if err != nil {
-		goroutineErr <- err
-	}
+	transposedPrevAct, _ := matrix.Trans(lastInput)
 
 	weight, err := matrix.Mult(m.deltas[index], transposedPrevAct)
 	if err != nil {
@@ -113,11 +110,15 @@ func (m *MultiLayerPerceptron) calculateWeight(index int, goroutineErr chan erro
 func (m *MultiLayerPerceptron) GradientDescent() error {
 
 	goErrs := make(chan error) // the updating can ran concurrently, we just need to check for errors
+	wg := new(sync.WaitGroup)
 
 	for i := 0; i <= len(m.hiddenLayers); i++ {
-		go m.updateWeight(i, goErrs)
-		go m.updateBias(i, goErrs)
+		wg.Add(2)
+		go m.updateWeight(i, goErrs, wg)
+		go m.updateBias(i, goErrs, wg)
 	}
+
+	wg.Wait()
 	for err := range goErrs {
 		if err != nil {
 			return err
@@ -129,7 +130,7 @@ func (m *MultiLayerPerceptron) GradientDescent() error {
 // updateWeights is ran concurrently and updates the weights from either the output layer
 // or one of the hidden ones by calling the method of the type with the error that needs to
 // be subtracted.
-func (m *MultiLayerPerceptron) updateWeight(index int, goErr chan error) {
+func (m *MultiLayerPerceptron) updateWeight(index int, goErr chan error, wg *sync.WaitGroup) {
 	m.weights[index].MultScalar(m.learningRate)
 	var err error
 
@@ -139,13 +140,15 @@ func (m *MultiLayerPerceptron) updateWeight(index int, goErr chan error) {
 		err = m.hiddenLayers[index].UpdateWeights(m.weights[index])
 	}
 
+	// TODO: close channel after done?
 	goErr <- err
+	wg.Done()
 }
 
 // updateBias is ran concurrently and updates the weights from either the output layer
 // or one of the hidden ones by calling the method of the type with the error that needs to
 // be subtracted.
-func (m *MultiLayerPerceptron) updateBias(index int, goErr chan error) {
+func (m *MultiLayerPerceptron) updateBias(index int, goErr chan error, wg *sync.WaitGroup) {
 
 	m.deltas[index].MultScalar(m.learningRate)
 	var err error
@@ -156,5 +159,7 @@ func (m *MultiLayerPerceptron) updateBias(index int, goErr chan error) {
 		err = m.hiddenLayers[index].UpdateBias(m.deltas[index])
 	}
 
+	// TODO: close channel after done?
 	goErr <- err
+	wg.Done()
 }

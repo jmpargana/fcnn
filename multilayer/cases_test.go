@@ -19,6 +19,12 @@ type updateBiasWeightTest struct {
 	delta, expected, biasWeights [][]float64
 }
 
+type calculateWeightsStruct struct {
+	hiddenLayers             []int
+	index                    int
+	prevOut, delta, expected [][]float64
+}
+
 var hiddenLayersTest = [][]int{
 	{23, 2, 12, 23, 42},
 	{3, 2},
@@ -664,4 +670,418 @@ var updateWeightTest = []updateBiasWeightTest{
 			{5, 0.5, 1},
 		},
 	},
+	{
+		actFn:        "identity",
+		learningRate: 0.2,
+		index:        0,
+		hiddenLayers: []int{3, 4, 1},
+		biasWeights: [][]float64{
+			{2, 2, 3},
+			{4, 3, 4},
+			{-2, 2, 1},
+			{10, 1, 2},
+		},
+		delta: [][]float64{
+			{20, 20, 30},
+			{40, 30, 40},
+			{-200, 20, 10},
+			{100, 10, 20},
+		},
+		expected: [][]float64{
+			{-2, -2, -3},
+			{-4, -3, -4},
+			{38, -2, -1},
+			{-10, -1, -2},
+		},
+	},
 }
+
+var updateWeightTestOut = []updateBiasWeightTest{
+	{
+		actFn:        "identity",
+		learningRate: 0.5,
+		index:        0,
+		hiddenLayers: []int{3, 4, 1},
+		biasWeights: [][]float64{
+			{2, 2, 3},
+			{4, 3, 4},
+			{-2, 2, 1},
+			{10, 1, 2},
+		},
+		delta: [][]float64{
+			{2, 2, 3},
+			{4, 3, 4},
+			{-2, 2, 1},
+			{10, 1, 2},
+		},
+		expected: [][]float64{
+			{1, 1, 1.5},
+			{2, 1.5, 2},
+			{-1, 1, 0.5},
+			{5, 0.5, 1},
+		},
+	},
+	{
+		actFn:        "identity",
+		learningRate: 0.2,
+		index:        0,
+		hiddenLayers: []int{3, 4, 1},
+		biasWeights: [][]float64{
+			{2, 2, 3},
+			{4, 3, 4},
+			{-2, 2, 1},
+			{10, 1, 2},
+		},
+		delta: [][]float64{
+			{20, 20, 30},
+			{40, 30, 40},
+			{-200, 20, 10},
+			{100, 10, 20},
+		},
+		expected: [][]float64{
+			{-2, -2, -3},
+			{-4, -3, -4},
+			{38, -2, -1},
+			{-10, -1, -2},
+		},
+	},
+}
+
+var updateWeightTestFail = []updateBiasWeightTest{
+	{
+		actFn:        "identity",
+		learningRate: 0.5,
+		index:        0,
+		hiddenLayers: []int{3, 4, 1},
+		biasWeights: [][]float64{
+			{2, 2, 3},
+			{4, 3, 4},
+			{-2, 2, 1},
+		},
+		delta: [][]float64{
+			{2, 2, 3},
+			{4, 3, 4},
+			{-2, 2, 1},
+			{10, 1, 2},
+		},
+		expected: [][]float64{
+			{1, 1, 1.5},
+			{2, 1.5, 2},
+			{-1, 1, 0.5},
+			{5, 0.5, 1},
+		},
+	},
+	{
+		actFn:        "identity",
+		learningRate: 0.2,
+		index:        0,
+		hiddenLayers: []int{3, 4, 1},
+		biasWeights: [][]float64{
+			{2, 2, 3},
+			{4, 3, 4},
+			{-2, 2, 1},
+			{10, 1, 2},
+		},
+		delta: [][]float64{
+			{20, 20, 30},
+			{40, 30, 40},
+			{-200, 20, 10},
+		},
+		expected: [][]float64{
+			{-2, -2, -3},
+			{-4, -3, -4},
+			{38, -2, -1},
+			{-10, -1, -2},
+		},
+	},
+}
+
+var calculateWeightTest = []calculateWeightsStruct{
+	{
+		hiddenLayers: []int{4, 3, 1},
+		index:        1,
+		prevOut: [][]float64{
+			{1},
+			{1},
+			{1},
+		},
+		delta: [][]float64{
+			{1},
+			{1},
+			{1},
+			{1},
+		},
+		expected: [][]float64{
+			{1, 1, 1},
+			{1, 1, 1},
+			{1, 1, 1},
+			{1, 1, 1},
+		},
+	},
+	{
+		hiddenLayers: []int{4, 4, 3, 1},
+		index:        2,
+		prevOut: [][]float64{
+			{1},
+			{-1},
+			{1},
+		},
+		delta: [][]float64{
+			{1},
+			{1},
+			{1},
+			{-1},
+		},
+		expected: [][]float64{
+			{1, -1, 1},
+			{1, -1, 1},
+			{1, -1, 1},
+			{-1, 1, -1},
+		},
+	},
+	{
+		hiddenLayers: []int{4, 3, 1},
+		index:        1,
+		prevOut: [][]float64{
+			{1},
+			{1},
+			{-1},
+		},
+		delta: [][]float64{
+			{2},
+			{3},
+			{2},
+			{4},
+		},
+		expected: [][]float64{
+			{2, 2, -2},
+			{3, 3, -3},
+			{2, 2, -2},
+			{4, 4, -4},
+		},
+	},
+	{
+		hiddenLayers: []int{4, 3, 5, 6, 1},
+		index:        3,
+		prevOut: [][]float64{
+			{10},
+			{1},
+			{10},
+			{1},
+			{10},
+		},
+		delta: [][]float64{
+			{0},
+			{0},
+			{1},
+			{0},
+			{1},
+			{0},
+		},
+		expected: [][]float64{
+			{0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0},
+			{10, 1, 10, 1, 10},
+			{0, 0, 0, 0, 0},
+			{10, 1, 10, 1, 10},
+			{0, 0, 0, 0, 0},
+		},
+	},
+}
+
+var calculateWeightTestOut = []calculateWeightsStruct{
+	{
+		hiddenLayers: []int{4, 3, 1},
+		index:        1,
+		prevOut: [][]float64{
+			{1},
+			{1},
+			{1},
+		},
+		delta: [][]float64{
+			{1},
+			{1},
+			{1},
+			{1},
+		},
+		expected: [][]float64{
+			{1, 1, 1},
+			{1, 1, 1},
+			{1, 1, 1},
+			{1, 1, 1},
+		},
+	},
+	{
+		hiddenLayers: []int{4, 4, 3, 1},
+		index:        2,
+		prevOut: [][]float64{
+			{1},
+			{-1},
+			{1},
+		},
+		delta: [][]float64{
+			{1},
+			{1},
+			{1},
+			{-1},
+		},
+		expected: [][]float64{
+			{1, -1, 1},
+			{1, -1, 1},
+			{1, -1, 1},
+			{-1, 1, -1},
+		},
+	},
+	{
+		hiddenLayers: []int{4, 3, 1},
+		index:        1,
+		prevOut: [][]float64{
+			{1},
+			{1},
+			{-1},
+		},
+		delta: [][]float64{
+			{2},
+			{3},
+			{2},
+			{4},
+		},
+		expected: [][]float64{
+			{2, 2, -2},
+			{3, 3, -3},
+			{2, 2, -2},
+			{4, 4, -4},
+		},
+	},
+	{
+		hiddenLayers: []int{4, 3, 5, 6, 1},
+		index:        3,
+		prevOut: [][]float64{
+			{10},
+			{1},
+			{10},
+			{1},
+			{10},
+		},
+		delta: [][]float64{
+			{0},
+			{0},
+			{1},
+			{0},
+			{1},
+			{0},
+		},
+		expected: [][]float64{
+			{0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0},
+			{10, 1, 10, 1, 10},
+			{0, 0, 0, 0, 0},
+			{10, 1, 10, 1, 10},
+			{0, 0, 0, 0, 0},
+		},
+	},
+}
+
+var calculateWeightTestInvalid = []calculateWeightsStruct{
+	{
+		hiddenLayers: []int{4, 3, 1},
+		index:        1,
+		prevOut: [][]float64{
+			{1},
+			{1},
+		},
+		delta: [][]float64{
+			{1},
+			{1},
+			{1},
+			{1},
+		},
+		expected: [][]float64{
+			{1, 1, 1},
+			{1, 1, 1},
+			{1, 1, 1},
+			{1, 1, 1},
+		},
+	},
+	{
+		hiddenLayers: []int{1, 4, 3, 1},
+		index:        2,
+		prevOut: [][]float64{
+			{1},
+			{-1},
+			{1},
+		},
+		delta: [][]float64{
+			{1},
+			{1},
+			{1},
+			{-1},
+		},
+		expected: [][]float64{
+			{1, -1, 1},
+			{1, -1, 1},
+			{1, -1, 1},
+			{-1, 1, -1},
+		},
+	},
+	{
+		hiddenLayers: []int{4, 3, 1},
+		index:        1,
+		prevOut: [][]float64{
+			{1},
+			{1},
+			{-1},
+		},
+		delta: [][]float64{
+			{2},
+			{3},
+			{2},
+		},
+		expected: [][]float64{
+			{2, 2, -2},
+			{3, 3, -3},
+			{2, 2, -2},
+			{4, 4, -4},
+		},
+	},
+	{
+		hiddenLayers: []int{4, 3, 5, 6, 1},
+		index:        3,
+		prevOut: [][]float64{
+			{10},
+			{1},
+			{10},
+			{1},
+			{10},
+			{10},
+		},
+		delta: [][]float64{
+			{0},
+			{0},
+			{1},
+			{0},
+			{1},
+			{0},
+		},
+		expected: [][]float64{
+			{0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0},
+			{10, 1, 10, 1, 10},
+			{0, 0, 0, 0, 0},
+			{10, 1, 10, 1, 10},
+			{0, 0, 0, 0, 0},
+		},
+	},
+}
+
+var gradientDescentTest = []struct {
+	hiddenLayers    []int
+	outputLayer     int
+	learningRate    float64
+	deltaBias       [][][]float64
+	expectedBias    [][][]float64
+	deltaWeights    [][][]float64
+	expectedWeights [][][]float64
+	bias            [][][]float64
+	weights         [][][]float64
+}{}

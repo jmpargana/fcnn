@@ -1,6 +1,7 @@
 package fcnn
 
 import (
+	"sync"
 	"testing"
 
 	"github.com/jmpargana/fcnn/layer"
@@ -130,7 +131,10 @@ func TestUpdateBias(t *testing.T) {
 		nn.deltas[index] = delta
 		nn.hiddenLayers[index].Bias = bias
 
-		go nn.updateBias(index, goErr)
+		wg := new(sync.WaitGroup)
+		wg.Add(1)
+		go nn.updateBias(index, goErr, wg)
+		// wg.Wait()
 
 		err, _ := <-goErr
 		if err != nil {
@@ -154,7 +158,10 @@ func TestUpdateBiasOut(t *testing.T) {
 		nn.deltas[len(nn.deltas)-1] = delta
 		nn.outputLayer.Bias = bias
 
-		go nn.updateBias(len(nn.deltas)-1, goErr)
+		wg := new(sync.WaitGroup)
+		wg.Add(1)
+		go nn.updateBias(len(nn.deltas)-1, goErr, wg)
+		// wg.Wait()
 
 		err, _ := <-goErr
 		if err != nil {
@@ -177,7 +184,10 @@ func TestUpdateBiasOutFail(t *testing.T) {
 		nn.deltas[len(nn.deltas)-1] = delta
 		nn.outputLayer.Bias = bias
 
-		go nn.updateBias(len(nn.deltas)-1, goErr)
+		wg := new(sync.WaitGroup)
+		wg.Add(1)
+		go nn.updateBias(len(nn.deltas)-1, goErr, wg)
+		// wg.Wait()
 
 		err, _ := <-goErr
 		if err == nil {
@@ -198,7 +208,10 @@ func TestUpdateWeights(t *testing.T) {
 		nn.weights[index] = delta
 		nn.hiddenLayers[index].Weights = weight
 
-		go nn.updateWeight(index, goErr)
+		wg := new(sync.WaitGroup)
+		wg.Add(1)
+		go nn.updateWeight(index, goErr, wg)
+		// wg.Wait()
 
 		err, _ := <-goErr
 		if err != nil {
@@ -207,6 +220,182 @@ func TestUpdateWeights(t *testing.T) {
 
 		if !expected.Equal(nn.hiddenLayers[index].Weights) {
 			t.Errorf("\n\nweight:\n%v\ndelta weights:\n%v\nmultiplyed by learning rate:%f\nshould be:\n%v\ngot:\n%v", delta, weight, test.learningRate, expected, nn.hiddenLayers[index].Weights)
+		}
+	}
+}
+
+func TestUpdateWeightsOut(t *testing.T) {
+	for _, test := range updateWeightTestOut {
+		goErr := make(chan error)
+		index := len(test.hiddenLayers) - 1
+		delta := matrix.NewFrom(test.delta)
+		weight := matrix.NewFrom(test.biasWeights)
+		expected := matrix.NewFrom(test.expected)
+
+		nn, _ := New(test.hiddenLayers, 1, test.actFn, "relu", 1, 1, test.learningRate)
+		nn.weights[index] = delta
+		nn.outputLayer.Weights = weight
+
+		wg := new(sync.WaitGroup)
+		wg.Add(1)
+		go nn.updateWeight(index, goErr, wg)
+		// wg.Wait()
+
+		err, _ := <-goErr
+		if err != nil {
+			t.Errorf("shouldn't fail here: %v", err)
+		}
+
+		if !expected.Equal(nn.outputLayer.Weights) {
+			t.Errorf("\n\nweight:\n%v\ndelta weights:\n%v\nmultiplyed by learning rate:%f\nshould be:\n%v\ngot:\n%v", delta, weight, test.learningRate, expected, nn.outputLayer.Weights)
+		}
+	}
+}
+
+func TestUpdateWeightsFail(t *testing.T) {
+	for _, test := range updateWeightTestFail {
+		goErr := make(chan error)
+		index := test.index
+		delta := matrix.NewFrom(test.delta)
+		weight := matrix.NewFrom(test.biasWeights)
+
+		nn, _ := New(test.hiddenLayers, 1, test.actFn, "relu", 1, 1, test.learningRate)
+		nn.weights[index] = delta
+		nn.hiddenLayers[index].Weights = weight
+
+		wg := new(sync.WaitGroup)
+		wg.Add(1)
+		go nn.updateWeight(index, goErr, wg)
+		// wg.Wait()
+
+		err, _ := <-goErr
+		if err == nil {
+			t.Errorf("shouldn't fail here: %v", err)
+		}
+	}
+}
+
+func TestCalculateWeight(t *testing.T) {
+	for _, test := range calculateWeightTest {
+		nn, _ := New(test.hiddenLayers, 1, "relu", "relu", 1, 1, 0.1)
+		index := test.index
+
+		prevOut := matrix.NewFrom(test.prevOut)
+		delta := matrix.NewFrom(test.delta)
+		expected := matrix.NewFrom(test.expected)
+
+		nn.deltas[index] = delta
+		nn.hiddenLayers[index-1].Output = prevOut
+
+		goErr := make(chan error)
+
+		go nn.calculateWeight(index, goErr)
+
+		err := <-goErr
+		if err != nil {
+			t.Errorf("wans't supposed to fail here: %v", err)
+		}
+
+		if !nn.weights[index].Equal(expected) {
+			t.Errorf("\nexpected:\n%vgot:\n%v", expected, nn.weights[index])
+		}
+	}
+}
+
+func TestCalculateWeightFirst(t *testing.T) {
+	for _, test := range calculateWeightTestOut {
+		nn, _ := New(test.hiddenLayers, 1, "relu", "relu", 1, 1, 0.1)
+
+		prevOut := matrix.NewFrom(test.prevOut)
+		delta := matrix.NewFrom(test.delta)
+		expected := matrix.NewFrom(test.expected)
+
+		nn.deltas[0] = delta
+		nn.lastInput = prevOut
+
+		goErr := make(chan error)
+
+		go nn.calculateWeight(0, goErr)
+
+		err := <-goErr
+		if err != nil {
+			t.Errorf("wans't supposed to fail here: %v", err)
+		}
+
+		if !nn.weights[0].Equal(expected) {
+			t.Errorf("\nexpected:\n%vgot:\n%v", expected, nn.weights[0])
+		}
+	}
+}
+
+func TestInvalidCalculateWeight(t *testing.T) {
+	for _, test := range calculateWeightTestInvalid {
+		nn, _ := New(test.hiddenLayers, 1, "relu", "relu", 1, 1, 0.1)
+
+		prevOut := matrix.NewFrom(test.prevOut)
+		delta := matrix.NewFrom(test.delta)
+		index := test.index
+
+		nn.deltas[index] = delta
+		nn.hiddenLayers[index-1].Output = prevOut
+
+		goErr := make(chan error)
+
+		go nn.calculateWeight(0, goErr)
+
+		err := <-goErr
+		if err == nil {
+			t.Errorf("supposed to fail here!")
+		}
+	}
+}
+
+func TestGradientDescent(t *testing.T) {
+	for _, test := range gradientDescentTest {
+		nn, _ := New(test.hiddenLayers, test.outputLayer, "relu", "relu", 1, 1, test.learningRate)
+
+		var deltaBias []matrix.Matrix
+		var deltaWeights []matrix.Matrix
+		var expectedWeights []matrix.Matrix
+		var expectedBias []matrix.Matrix
+
+		// initialize slice of deltas (weights and bias)
+		// and expected results
+		for i := range test.deltaWeights {
+			deltaBias = append(deltaBias, matrix.NewFrom(test.deltaBias[i]))
+			deltaWeights = append(deltaWeights, matrix.NewFrom(test.deltaWeights[i]))
+			expectedWeights = append(expectedWeights, matrix.NewFrom(test.expectedWeights[i]))
+			expectedBias = append(expectedBias, matrix.NewFrom(test.expectedBias[i]))
+		}
+
+		// save current bias and weights in each layer
+		for i := range nn.hiddenLayers {
+			nn.hiddenLayers[i].Bias = matrix.NewFrom(test.bias[i])
+			nn.hiddenLayers[i].Weights = matrix.NewFrom(test.weights[i])
+		}
+		nn.outputLayer.Bias = matrix.NewFrom(test.bias[len(nn.hiddenLayers)])
+		nn.outputLayer.Weights = matrix.NewFrom(test.weights[len(nn.hiddenLayers)])
+
+		if err := nn.GradientDescent(); err != nil {
+			t.Errorf("failed with: %v", err)
+		}
+
+		for i, l := range nn.hiddenLayers {
+			if !l.Bias.Equal(expectedBias[i]) {
+				t.Errorf("\nexpected:\n%v\ngot:\n%v\n", expectedBias[i], l.Bias)
+			}
+			if !l.Weights.Equal(expectedWeights[i]) {
+				t.Errorf("\nexpected:\n%v\ngot:\n%v\n", expectedWeights[i], l.Weights)
+			}
+		}
+
+		lastIndex := len(nn.hiddenLayers)
+
+		if !nn.outputLayer.Bias.Equal(expectedBias[lastIndex]) {
+			t.Errorf("\nexpected:\n%v\ngot:\n%v\n", expectedBias[lastIndex], nn.outputLayer.Bias)
+		}
+		if !nn.outputLayer.Weights.Equal(expectedWeights[lastIndex]) {
+			t.Errorf("\nexpected:\n%v\ngot:\n%v\n", expectedWeights[lastIndex], nn.outputLayer.Weights)
 		}
 	}
 }
