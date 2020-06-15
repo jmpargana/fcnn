@@ -1,0 +1,10 @@
+{
+    "hidden_layers": [784,100,50],
+    "output": 10,
+    "learning_rate": 0.1,
+    "epochs": 3,
+    "batch_size": 10,
+    "reader": "../readers/mnist.go",
+    "train_data": "../datasets/train-images-idx3-ubyte",
+    "validation_data": "../datasets/train-labels-idx3-ubyte"
+}
