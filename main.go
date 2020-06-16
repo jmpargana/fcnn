@@ -45,6 +45,10 @@ func run() error {
 		return errors.New("can't predict and train at the same time")
 	} else if *predict && *model == "" {
 		return errors.New("need a named model to load")
+	} else if *predict && *model != "" {
+		if err := loadModel(*model); err != nil {
+			return err
+		}
 	} else if !*train {
 		return errors.New("the neural network needs to do something. either train or predict!")
 	} else if *config != "" {
@@ -69,7 +73,7 @@ func run() error {
 		*trainData == "" ||
 		*valData == "" ||
 		*reader == "" {
-		return errors.New("either provide a config or with all flags filled")
+		return errors.New("either provide a config file or all flags")
 	}
 
 	// parse hiddenLayers
