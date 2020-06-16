@@ -13,7 +13,7 @@ func (m *MultiLayerPerceptron) ForwProp(in matrix.Matrix) (matrix.Matrix, error)
 
 	m.lastInput = in // this will be needed to complete the back propagation
 
-	for _, layer := range m.hiddenLayers {
+	for _, layer := range m.HiddenLayers {
 
 		var err error
 		in, err = layer.ForwProp(in)
@@ -76,13 +76,13 @@ func (m *MultiLayerPerceptron) calculateDelta(index int, output matrix.Matrix) e
 	if index == len(m.deltas)-1 {
 		delta, err = m.outputLayer.BackPropOutLayer(output)
 	} else if index == len(m.deltas)-2 {
-		delta, err = m.hiddenLayers[index].BackProp(
+		delta, err = m.HiddenLayers[index].BackProp(
 			m.deltas[index+1],
 			m.outputLayer.Weights)
 	} else {
-		delta, err = m.hiddenLayers[index].BackProp(
+		delta, err = m.HiddenLayers[index].BackProp(
 			m.deltas[index+1],
-			m.hiddenLayers[index+1].Weights)
+			m.HiddenLayers[index+1].Weights)
 	}
 
 	if err != nil {
@@ -103,7 +103,7 @@ func (m *MultiLayerPerceptron) calculateWeight(index int, goroutineErr chan erro
 	if index == 0 {
 		lastInput = m.lastInput
 	} else {
-		lastInput = m.hiddenLayers[index-1].Output
+		lastInput = m.HiddenLayers[index-1].Output
 	}
 	transposedPrevAct, _ := matrix.Trans(lastInput)
 
@@ -126,7 +126,7 @@ func (m *MultiLayerPerceptron) GradientDescent() error {
 	goErrs := make(chan error) // the updating can ran concurrently, we just need to check for errors
 	wg := new(sync.WaitGroup)
 
-	for i := 0; i <= len(m.hiddenLayers); i++ {
+	for i := 0; i <= len(m.HiddenLayers); i++ {
 		wg.Add(2)
 		go m.updateWeight(i, goErrs, wg)
 		go m.updateBias(i, goErrs, wg)
@@ -147,7 +147,7 @@ func (m *MultiLayerPerceptron) updateWeight(index int, goErr chan error, wg *syn
 	if index == len(m.deltas)-1 {
 		err = m.outputLayer.UpdateWeights(m.weights[index])
 	} else {
-		err = m.hiddenLayers[index].UpdateWeights(m.weights[index])
+		err = m.HiddenLayers[index].UpdateWeights(m.weights[index])
 	}
 
 	wg.Done()
@@ -165,7 +165,7 @@ func (m *MultiLayerPerceptron) updateBias(index int, goErr chan error, wg *sync.
 	if index == len(m.deltas)-1 {
 		err = m.outputLayer.UpdateBias(m.deltas[index])
 	} else {
-		err = m.hiddenLayers[index].UpdateBias(m.deltas[index])
+		err = m.HiddenLayers[index].UpdateBias(m.deltas[index])
 	}
 
 	wg.Done()

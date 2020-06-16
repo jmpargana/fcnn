@@ -5,11 +5,11 @@ import (
 	"github.com/jmpargana/matrix"
 )
 
-// MultiLayerPerceptron is an abstraction of the hiddenLayers and outputLayer.
+// MultiLayerPerceptron is an abstraction of the HiddenLayers and outputLayer.
 // It performs the forward propagation sequentially layer by layer for each epoch,
 // but concurrently for all vectors in the expected batch size.
 type MultiLayerPerceptron struct {
-	hiddenLayers         []layer.Layer
+	HiddenLayers         []layer.Layer
 	outputLayer          layer.Layer
 	batchSize, epochSize int
 	learningRate         float64

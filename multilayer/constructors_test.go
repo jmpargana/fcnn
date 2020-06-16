@@ -5,7 +5,7 @@ import (
 )
 
 func TestHiddenLayers(t *testing.T) {
-	for _, hl := range hiddenLayersTest {
+	for _, hl := range HiddenLayersTest {
 		hlayers, err := startHiddenLayers("relu", hl)
 		if err != nil {
 			t.Errorf("shouldn't fail here: %v", err)

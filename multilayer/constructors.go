@@ -14,7 +14,7 @@ import (
 // in/output with the respective sizes: 1->2, 2->3, 3->4.
 // New also receives the activation functions for the hidden and output layers
 // as well as a batch, epoch size and a learning rate.
-func New(hiddenLayers []int,
+func New(HiddenLayers []int,
 	outputLayer int,
 	hiddenActFn,
 	outputActFn string,
@@ -30,24 +30,24 @@ func New(hiddenLayers []int,
 		return MultiLayerPerceptron{}, errors.New("learning rate needs to have value between 0 and 1")
 	}
 
-	hLayers, err := startHiddenLayers(hiddenActFn, hiddenLayers)
+	hLayers, err := startHiddenLayers(hiddenActFn, HiddenLayers)
 	if err != nil {
 		return MultiLayerPerceptron{}, err
 	}
 
-	oLayer, err := layer.New(outputActFn, hiddenLayers[len(hiddenLayers)-1], outputLayer)
+	oLayer, err := layer.New(outputActFn, HiddenLayers[len(HiddenLayers)-1], outputLayer)
 	if err != nil {
 		return MultiLayerPerceptron{}, err
 	}
 
 	// since the hidden layers already contains in and out sizes it has the
 	// same length as counting with the output layer
-	weights := make([]matrix.Matrix, len(hiddenLayers))
-	deltas := make([]matrix.Matrix, len(hiddenLayers))
-	lastInput := matrix.New(hiddenLayers[0], 1)
+	weights := make([]matrix.Matrix, len(HiddenLayers))
+	deltas := make([]matrix.Matrix, len(HiddenLayers))
+	lastInput := matrix.New(HiddenLayers[0], 1)
 
 	return MultiLayerPerceptron{
-		hiddenLayers: hLayers,
+		HiddenLayers: hLayers,
 		outputLayer:  oLayer,
 		batchSize:    batchSize,
 		epochSize:    epochSize,
@@ -60,15 +60,15 @@ func New(hiddenLayers []int,
 
 // startHiddeLayers is a helper function to seperate concerns and make it
 // easier to unittest every single part of the code that might fail.
-func startHiddenLayers(hiddenActFn string, hiddenLayers []int) ([]layer.Layer, error) {
-	if len(hiddenLayers) < 2 {
+func startHiddenLayers(hiddenActFn string, HiddenLayers []int) ([]layer.Layer, error) {
+	if len(HiddenLayers) < 2 {
 		return nil, errors.New("at least one hidden layer is needed, only input size provided")
 	}
 
-	hLayers := make([]layer.Layer, 0, len(hiddenLayers)-1)
+	hLayers := make([]layer.Layer, 0, len(HiddenLayers)-1)
 
-	for i := 0; i < len(hiddenLayers)-1; i++ {
-		l, err := layer.New(hiddenActFn, hiddenLayers[i], hiddenLayers[i+1])
+	for i := 0; i < len(HiddenLayers)-1; i++ {
+		l, err := layer.New(hiddenActFn, HiddenLayers[i], HiddenLayers[i+1])
 		if err != nil {
 			return nil, err
 		}

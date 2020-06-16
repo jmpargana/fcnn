@@ -1,6 +1,8 @@
 package main
 
 import (
+	"time"
+
 	"github.com/jmpargana/fcnn/multilayer"
 	"github.com/jmpargana/fcnn/readers"
 )
@@ -37,11 +39,46 @@ func start(conf Config) error {
 		}
 	}
 
-	// TODO: save model when done
-
+	if err := saveNetwork(nn, conf.Model, conf.Reader); err != nil {
+		return err
+	}
 	return nil
 }
 
 func loadModel(model string) error {
+	// h, err := os.Create("models/" + model + "_hidden_weights.model")
+	// if err != nil {
+	// 	return err
+	// }
+	// o, err := os.Create("models/" + model + "_output_weights.model")
+	// if err != nil {
+	// 	return err
+	// }
+
+	// nn, err := multilayer.New()
+
+	return nil
+}
+
+func saveNetwork(nn multilayer.MultiLayerPerceptron, modelName, reader string) error {
+	if modelName == "" {
+		modelName = reader + time.Now().String()
+	}
+
+	// h, err := os.Create("models/" + modelName + "_hidden_weights.model")
+	// if err != nil {
+	// 	return err
+	// }
+	// o, err := os.Create("models/" + modelName + "_output_weights.model")
+	// if err != nil {
+	// 	return err
+	// }
+
+	// // TODO: method not available for matrix, needs to be implemented from scratch
+	// nn.HiddenLayers.MarshalBinaryTo(h)
+	// nn.Output.MarshalBinaryTo(o)
+
+	// h.Close()
+	// o.Close()
 	return nil
 }
