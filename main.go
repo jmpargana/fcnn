@@ -24,15 +24,27 @@ var (
 	trainData    = flag.String("trainData", "", "path to training data")
 	valData      = flag.String("valData", "", "path to validation data")
 	reader       = flag.String("reader", "", "path to dataset reader")
+	file         = flag.String("file", "", "file to predict")
 )
 
 func main() {
 	flag.Usage = func() {
-		fmt.Println("Usage")
+		fmt.Printf("Usage of %v\n", os.Args[0])
+		fmt.Println("\tYou can either train or predict a model using the fully connected")
+		fmt.Println("\tneural network.")
+		fmt.Println()
+		fmt.Println("\tTo train load a json config file like in examples/mnist_config.json")
+		fmt.Println("\tOr start the script with all needed flags:")
+		fmt.Printf("\t\t%v -train -config [filename]\n", os.Args[0])
+		fmt.Printf("\t\t%v -train -hidden 3,4,5 -output 10 -lr 0.1 ...\n", os.Args[0])
+		fmt.Println()
+		fmt.Println("\tTo predict load the model by name and a file")
+		fmt.Printf("\t\t%v -predict -model [modelname] -file [filename]\n", os.Args[0])
+		fmt.Println()
 		flag.PrintDefaults()
 	}
 	if err := run(); err != nil {
-		fmt.Fprintf(os.Stderr, "%v\n", err)
+		fmt.Fprintf(os.Stderr, "%v\n\n", err)
 		flag.Usage()
 		os.Exit(1)
 	}

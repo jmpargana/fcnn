@@ -3,7 +3,6 @@ package fcnn
 import (
 	"sync"
 	"testing"
-	"time"
 
 	"github.com/jmpargana/fcnn/layer"
 	"github.com/jmpargana/matrix"
@@ -387,7 +386,7 @@ func TestGradientDescent(t *testing.T) {
 			t.Errorf("failed with: %v", err)
 		}
 
-		time.Sleep(1000000)
+		// time.Sleep(1000000)
 
 		for i, l := range nn.hiddenLayers {
 			if !l.Bias.Equal(expectedBias[i]) {
