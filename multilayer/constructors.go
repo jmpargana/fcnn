@@ -1,9 +1,8 @@
-package fcnn
+package multilayer
 
 import (
 	// "encoding/json"
 	"errors"
-	"os"
 
 	"github.com/jmpargana/fcnn/layer"
 	"github.com/jmpargana/matrix"
@@ -78,10 +77,4 @@ func startHiddenLayers(hiddenActFn string, hiddenLayers []int) ([]layer.Layer, e
 	}
 
 	return hLayers, nil
-}
-
-// TODO: implement or abstract. This configuration could be read in the main function
-// from some json file and the New constructor gets called.
-func NewConfig(config os.File) (MultiLayerPerceptron, error) {
-	return MultiLayerPerceptron{}, nil
 }

@@ -1,7 +1,7 @@
 // MNIST database reader
 // http://yann.lecun.com/exdb/mnist/
 // https://gist.githubusercontent.com/higuma/dbcd006546eb844c01e5102b4d0bcc93/raw/e3f3b72a0d3a212bfa0b65feb52d7a73bcf72913/mnist.go
-package mnist
+package readers
 
 import (
 	"fmt"

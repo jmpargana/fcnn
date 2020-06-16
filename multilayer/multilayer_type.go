@@ -1,4 +1,4 @@
-package fcnn
+package multilayer
 
 import (
 	"github.com/jmpargana/fcnn/layer"

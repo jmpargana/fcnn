@@ -1,4 +1,4 @@
-package fcnn
+package multilayer
 
 type deltaOutStruct struct {
 	actFn                 string
