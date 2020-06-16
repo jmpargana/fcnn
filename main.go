@@ -1,4 +1,4 @@
-package fcnn
+package main
 
 import (
 	"errors"
