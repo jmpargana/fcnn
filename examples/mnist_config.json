@@ -1,6 +1,9 @@
 {
+    "model": "mnist",
     "hidden_layers": [784,100,50],
     "output": 10,
+    "activation_function": "relu",
+    "out_activation_function": "softmax",
     "learning_rate": 0.1,
     "epochs": 3,
     "batch_size": 10,
