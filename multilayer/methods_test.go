@@ -3,6 +3,7 @@ package fcnn
 import (
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/jmpargana/fcnn/layer"
 	"github.com/jmpargana/matrix"
@@ -134,7 +135,7 @@ func TestUpdateBias(t *testing.T) {
 		wg := new(sync.WaitGroup)
 		wg.Add(1)
 		go nn.updateBias(index, goErr, wg)
-		// wg.Wait()
+		wg.Wait()
 
 		err, _ := <-goErr
 		if err != nil {
@@ -161,7 +162,7 @@ func TestUpdateBiasOut(t *testing.T) {
 		wg := new(sync.WaitGroup)
 		wg.Add(1)
 		go nn.updateBias(len(nn.deltas)-1, goErr, wg)
-		// wg.Wait()
+		wg.Wait()
 
 		err, _ := <-goErr
 		if err != nil {
@@ -187,7 +188,7 @@ func TestUpdateBiasOutFail(t *testing.T) {
 		wg := new(sync.WaitGroup)
 		wg.Add(1)
 		go nn.updateBias(len(nn.deltas)-1, goErr, wg)
-		// wg.Wait()
+		wg.Wait()
 
 		err, _ := <-goErr
 		if err == nil {
@@ -211,7 +212,7 @@ func TestUpdateWeights(t *testing.T) {
 		wg := new(sync.WaitGroup)
 		wg.Add(1)
 		go nn.updateWeight(index, goErr, wg)
-		// wg.Wait()
+		wg.Wait()
 
 		err, _ := <-goErr
 		if err != nil {
@@ -239,7 +240,7 @@ func TestUpdateWeightsOut(t *testing.T) {
 		wg := new(sync.WaitGroup)
 		wg.Add(1)
 		go nn.updateWeight(index, goErr, wg)
-		// wg.Wait()
+		wg.Wait()
 
 		err, _ := <-goErr
 		if err != nil {
@@ -266,7 +267,7 @@ func TestUpdateWeightsFail(t *testing.T) {
 		wg := new(sync.WaitGroup)
 		wg.Add(1)
 		go nn.updateWeight(index, goErr, wg)
-		// wg.Wait()
+		wg.Wait()
 
 		err, _ := <-goErr
 		if err == nil {
@@ -379,9 +380,14 @@ func TestGradientDescent(t *testing.T) {
 		nn.outputLayer.Bias = matrix.NewFrom(test.bias[len(nn.hiddenLayers)])
 		nn.outputLayer.Weights = matrix.NewFrom(test.weights[len(nn.hiddenLayers)])
 
+		nn.deltas = deltaBias
+		nn.weights = deltaWeights
+
 		if err := nn.GradientDescent(); err != nil {
 			t.Errorf("failed with: %v", err)
 		}
+
+		time.Sleep(1000000)
 
 		for i, l := range nn.hiddenLayers {
 			if !l.Bias.Equal(expectedBias[i]) {

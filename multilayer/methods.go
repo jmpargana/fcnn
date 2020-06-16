@@ -125,7 +125,6 @@ func (m *MultiLayerPerceptron) GradientDescent() error {
 
 	goErrs := make(chan error) // the updating can ran concurrently, we just need to check for errors
 	wg := new(sync.WaitGroup)
-	wgDone := make(chan struct{})
 
 	for i := 0; i <= len(m.hiddenLayers); i++ {
 		wg.Add(2)
@@ -133,21 +132,7 @@ func (m *MultiLayerPerceptron) GradientDescent() error {
 		go m.updateBias(i, goErrs, wg)
 	}
 
-	go func() {
-		wg.Wait()
-		close(wgDone)
-	}()
-
-	// if error is received break gradient descent and inform caller
-	select {
-	case <-wgDone:
-		break
-	case err := <-goErrs:
-		if err != nil {
-			close(goErrs)
-			return err
-		}
-	}
+	wg.Wait()
 
 	return nil
 }
@@ -165,8 +150,8 @@ func (m *MultiLayerPerceptron) updateWeight(index int, goErr chan error, wg *syn
 		err = m.hiddenLayers[index].UpdateWeights(m.weights[index])
 	}
 
-	goErr <- err
 	wg.Done()
+	goErr <- err
 }
 
 // updateBias is ran concurrently and updates the weights from either the output layer
@@ -183,6 +168,6 @@ func (m *MultiLayerPerceptron) updateBias(index int, goErr chan error, wg *sync.
 		err = m.hiddenLayers[index].UpdateBias(m.deltas[index])
 	}
 
-	goErr <- err
 	wg.Done()
+	goErr <- err
 }
