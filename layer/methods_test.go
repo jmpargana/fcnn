@@ -276,3 +276,23 @@ func TestBackPropInvalid(t *testing.T) {
 		}
 	}
 }
+
+func TestEncoding(t *testing.T) {
+	t.Run("test encoder", func(t *testing.T) {
+		layer, err := New("relu", 5, 10)
+		l := &Layer{}
+
+		if err != nil {
+			t.Errorf("shouldn't fail with constructor: %v", err)
+		}
+
+		data, err := layer.MarshalBinary()
+		if err != nil {
+			t.Errorf("failed encoding: %v", err)
+		}
+
+		if err := l.UnmarshalBinary(data); err != nil {
+			t.Errorf("failed decoding: %v", err)
+		}
+	})
+}

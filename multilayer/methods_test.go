@@ -1,6 +1,8 @@
 package multilayer
 
 import (
+	"log"
+	"reflect"
 	"sync"
 	"testing"
 
@@ -405,5 +407,32 @@ func TestGradientDescent(t *testing.T) {
 		if !nn.outputLayer.Weights.Equal(expectedWeights[lastIndex]) {
 			t.Errorf("\nexpected:\n%v\ngot:\n%v\n", expectedWeights[lastIndex], nn.outputLayer.Weights)
 		}
+	}
+}
+
+func TestGobEncoding(t *testing.T) {
+	m, err := New([]int{3, 4, 5}, 10, "relu", "softmax", 5, 5, 0.2)
+	if err != nil {
+		t.Errorf("shouldn't fail with constructor: %v", err)
+	}
+
+	mlp := MultiLayerPerceptron{}
+	data, err := m.MashalBinary()
+	if err != nil {
+		t.Errorf("failed encoding mlp: %v", err)
+	}
+
+	if data == nil {
+		t.Errorf("trying to decode nil value")
+	}
+
+	log.Print(data)
+
+	if err := mlp.UnmarshalBinary(data); err != nil {
+		t.Errorf("failed decoding mlp: %v", err)
+	}
+
+	if !reflect.DeepEqual(m, mlp) {
+		t.Errorf("got:\n%v\nwant:\n%v\n", mlp, m)
 	}
 }

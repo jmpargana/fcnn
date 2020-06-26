@@ -11,3 +11,8 @@ type Layer struct {
 	actFn                      string
 	Weights, Output, Sum, Bias matrix.Matrix
 }
+
+type wrapLayer struct {
+	ActFn                      string
+	Weights, Output, Sum, Bias matrix.Matrix
+}

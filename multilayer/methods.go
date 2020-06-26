@@ -1,6 +1,8 @@
 package multilayer
 
 import (
+	"bytes"
+	"encoding/gob"
 	"sync"
 
 	"github.com/jmpargana/matrix"
@@ -170,4 +172,25 @@ func (m *MultiLayerPerceptron) updateBias(index int, goErr chan error, wg *sync.
 
 	wg.Done()
 	goErr <- err
+}
+
+func (m *MultiLayerPerceptron) MashalBinary() ([]byte, error) {
+	b := new(bytes.Buffer)
+	enc := gob.NewEncoder(b)
+	if err := enc.Encode(m); err != nil {
+		return nil, err
+	}
+
+	return b.Bytes(), nil
+}
+
+func (m *MultiLayerPerceptron) UnmarshalBinary(data []byte) error {
+	mlp := new(MultiLayerPerceptron)
+	b := new(bytes.Buffer)
+	dec := gob.NewDecoder(b)
+	if err := dec.Decode(mlp); err != nil {
+		return err
+	}
+	m = mlp
+	return nil
 }
