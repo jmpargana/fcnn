@@ -16,3 +16,14 @@ type MultiLayerPerceptron struct {
 	deltas, weights      []matrix.Matrix
 	lastInput            matrix.Matrix
 }
+
+// wrapMultiLayerPerceptron is a wrapper to help marshaling the neural network
+// with the gob encoder/decoder.
+type wrapMultiLayerPerceptron struct {
+	HiddenLayers         []layer.Layer
+	OutputLayer          layer.Layer
+	BatchSize, EpochSize int
+	LearningRate         float64
+	Deltas, Weights      []matrix.Matrix
+	LastInput            matrix.Matrix
+}
