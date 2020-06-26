@@ -171,3 +171,28 @@ func (m *MultiLayerPerceptron) updateBias(index int, goErr chan error, wg *sync.
 	wg.Done()
 	goErr <- err
 }
+
+// Equal compares two mlps by testing each of the hiddenlayers with the correct
+// indices, the output ones and the batch, epoch und learning rate values.
+// The remaining member attributes are only placeholders for the back propagation
+// and radient descent algorithm, no prevent unneccessary memory allocation so
+// don't need to be exactly the same.
+func (m *MultiLayerPerceptron) Equal(other MultiLayerPerceptron) bool {
+	if len(m.HiddenLayers) != len(other.HiddenLayers) {
+		return false
+	}
+
+	for i := range m.HiddenLayers {
+		if !m.HiddenLayers[i].Equal(other.HiddenLayers[i]) {
+			return false
+		}
+	}
+
+	if !m.outputLayer.Equal(other.outputLayer) {
+		return false
+	}
+
+	return m.batchSize == other.batchSize &&
+		m.epochSize == other.epochSize &&
+		m.learningRate == other.learningRate
+}

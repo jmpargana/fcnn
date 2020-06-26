@@ -39,6 +39,10 @@ func TestDecoder(t *testing.T) {
 			if err := mlp.UnmarshalBinary(data); err != nil {
 				t.Errorf("failed decoding: %v", err)
 			}
+
+			if !m.Equal(mlp) {
+				t.Errorf("got:\n%vwanted:\n%v", mlp, m)
+			}
 		})
 	}
 }
