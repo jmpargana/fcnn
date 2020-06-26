@@ -296,3 +296,51 @@ func TestEncoding(t *testing.T) {
 		}
 	})
 }
+
+func TestEquality(t *testing.T) {
+
+	tt := map[string]struct {
+		actFn         string
+		in, out       int
+		weights, bias [][]float64
+	}{
+		"normal comparison": {
+			actFn: "relu",
+			in:    8,
+			out:   10,
+			weights: [][]float64{
+				{1, 3, 2, 3},
+				{8, 3, 2, 3},
+			},
+			bias: [][]float64{
+				{3},
+				{3},
+			},
+		},
+	}
+
+	for name, tc := range tt {
+		t.Run(name, func(t *testing.T) {
+			l1, err := New(tc.actFn, tc.in, tc.out)
+			if err != nil {
+				t.Errorf("failed with constructor: %v", err)
+			}
+			l2, err := New(tc.actFn, tc.in, tc.out)
+			if err != nil {
+				t.Errorf("failed with constructor: %v", err)
+			}
+
+			weights := matrix.NewFrom(tc.weights)
+			bias := matrix.NewFrom(tc.bias)
+
+			l1.Weights = weights
+			l2.Weights = weights
+			l1.Bias = bias
+			l2.Bias = bias
+
+			if !l1.Equal(l2) {
+				t.Errorf("%s should be equal to %s", l1, l2)
+			}
+		})
+	}
+}

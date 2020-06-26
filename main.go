@@ -58,7 +58,7 @@ func run() error {
 	} else if *predict && *model == "" {
 		return errors.New("need a named model to load")
 	} else if *predict && *model != "" {
-		if err := loadModel(*model); err != nil {
+		if _, err := loadModel(*model); err != nil {
 			return err
 		}
 	} else if !*train {

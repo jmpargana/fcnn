@@ -1,6 +1,8 @@
 package main
 
 import (
+	"io/ioutil"
+	"os"
 	"time"
 
 	"github.com/jmpargana/fcnn/multilayer"
@@ -24,8 +26,6 @@ func start(conf Config) error {
 	}
 
 	for i := 0; i < conf.Epochs; i++ {
-		// TODO: log intermediate scores to user and
-		// should only perform gradient descent batchwise
 		for j := range train {
 			if _, err := nn.ForwProp(train[j].Image); err != nil {
 				return err
@@ -36,6 +36,8 @@ func start(conf Config) error {
 			if err := nn.GradientDescent(); err != nil {
 				return err
 			}
+			// TODO: log intermediate scores to user and
+			// should only perform gradient descent batchwise
 		}
 	}
 
@@ -45,40 +47,41 @@ func start(conf Config) error {
 	return nil
 }
 
-func loadModel(model string) error {
-	// h, err := os.Create("models/" + model + "_hidden_weights.model")
-	// if err != nil {
-	// 	return err
-	// }
-	// o, err := os.Create("models/" + model + "_output_weights.model")
-	// if err != nil {
-	// 	return err
-	// }
+// loadModel loads a gob file with an existing trained neural network.
+func loadModel(model string) (multilayer.MultiLayerPerceptron, error) {
+	f, err := os.Open(model)
+	if err != nil {
+		return multilayer.MultiLayerPerceptron{}, err
+	}
 
-	// nn, err := multilayer.New()
+	nn := multilayer.MultiLayerPerceptron{}
+	data, err := ioutil.ReadAll(f)
+	if err != nil {
+		return multilayer.MultiLayerPerceptron{}, err
+	}
 
-	return nil
+	if err := nn.UnmarshalBinary(data); err != nil {
+		return multilayer.MultiLayerPerceptron{}, err
+	}
+
+	return nn, nil
 }
 
+// saveNetwork uploads the binary encoded structure of an instance of the neural
+// network.
 func saveNetwork(nn multilayer.MultiLayerPerceptron, modelName, reader string) error {
 	if modelName == "" {
 		modelName = reader + time.Now().String()
 	}
 
-	// h, err := os.Create("models/" + modelName + "_hidden_weights.model")
-	// if err != nil {
-	// 	return err
-	// }
-	// o, err := os.Create("models/" + modelName + "_output_weights.model")
-	// if err != nil {
-	// 	return err
-	// }
+	data, err := nn.MarshalBinary()
+	if err != nil {
+		return err
+	}
 
-	// // TODO: method not available for matrix, needs to be implemented from scratch
-	// nn.HiddenLayers.MarshalBinaryTo(h)
-	// nn.Output.MarshalBinaryTo(o)
+	if err := ioutil.WriteFile("models/"+modelName+".model.gob", data, 0644); err != nil {
+		return err
+	}
 
-	// h.Close()
-	// o.Close()
 	return nil
 }
