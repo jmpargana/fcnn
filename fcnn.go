@@ -34,9 +34,19 @@ func start(conf Config) error {
 		}
 	}
 
-	if err := saveNetwork(nn, conf.Model, conf.Reader); err != nil {
+	err = saveNetwork(nn, conf.Model, conf.Reader)
+	return err
+}
+
+func runPrediction(modelName, filename string) error {
+	nn, err := loadModel(modelName)
+	if err != nil {
 		return err
 	}
+
+	// predict here
+	_ = nn
+
 	return nil
 }
 
@@ -79,6 +89,8 @@ func saveNetwork(nn multilayer.MultiLayerPerceptron, modelName, reader string) e
 	return nil
 }
 
+// fromParsedConfig just creates an instance of a fcnn given a Config struct.
+// It will fail if any of the settings are invalid and return an error.
 func fromParsedConfig(conf Config) (multilayer.MultiLayerPerceptron, error) {
 
 	nn, err := multilayer.New(
