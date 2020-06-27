@@ -13,14 +13,7 @@ func start(conf Config) error {
 	// load data from reader using a bufio not to overload cpu memory
 	train, err := readers.Mnist(conf.TrainData, conf.ValidationData)
 
-	nn, err := multilayer.New(
-		conf.HiddenLayers,
-		conf.Output,
-		conf.ActFn,
-		conf.OutActFn,
-		conf.BatchSize,
-		conf.Epochs,
-		conf.LearningRate)
+	nn, err := fromParsedConfig(conf)
 	if err != nil {
 		return err
 	}
@@ -48,8 +41,8 @@ func start(conf Config) error {
 }
 
 // loadModel loads a gob file with an existing trained neural network.
-func loadModel(model string) (multilayer.MultiLayerPerceptron, error) {
-	f, err := os.Open(model)
+func loadModel(modelName string) (multilayer.MultiLayerPerceptron, error) {
+	f, err := os.Open("models/" + modelName + ".model.gob")
 	if err != nil {
 		return multilayer.MultiLayerPerceptron{}, err
 	}
@@ -84,4 +77,21 @@ func saveNetwork(nn multilayer.MultiLayerPerceptron, modelName, reader string) e
 	}
 
 	return nil
+}
+
+func fromParsedConfig(conf Config) (multilayer.MultiLayerPerceptron, error) {
+
+	nn, err := multilayer.New(
+		conf.HiddenLayers,
+		conf.Output,
+		conf.ActFn,
+		conf.OutActFn,
+		conf.BatchSize,
+		conf.Epochs,
+		conf.LearningRate)
+	if err != nil {
+		return multilayer.MultiLayerPerceptron{}, err
+	}
+
+	return nn, nil
 }
