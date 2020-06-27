@@ -34,8 +34,7 @@ func start(conf Config) error {
 		}
 	}
 
-	err = saveNetwork(nn, conf.Model, conf.Reader)
-	return err
+	return saveNetwork(nn, conf.Model, conf.Reader)
 }
 
 func runPrediction(modelName, filename string) error {
@@ -63,11 +62,8 @@ func loadModel(modelName string) (multilayer.MultiLayerPerceptron, error) {
 		return multilayer.MultiLayerPerceptron{}, err
 	}
 
-	if err := nn.UnmarshalBinary(data); err != nil {
-		return multilayer.MultiLayerPerceptron{}, err
-	}
-
-	return nn, nil
+	err = nn.UnmarshalBinary(data)
+	return nn, err
 }
 
 // saveNetwork uploads the binary encoded structure of an instance of the neural
@@ -89,8 +85,7 @@ func saveNetwork(nn multilayer.MultiLayerPerceptron, modelName, reader string) e
 // fromParsedConfig just creates an instance of a fcnn given a Config struct.
 // It will fail if any of the settings are invalid and return an error.
 func fromParsedConfig(conf Config) (multilayer.MultiLayerPerceptron, error) {
-
-	nn, err := multilayer.New(
+	return multilayer.New(
 		conf.HiddenLayers,
 		conf.Output,
 		conf.ActFn,
@@ -98,9 +93,4 @@ func fromParsedConfig(conf Config) (multilayer.MultiLayerPerceptron, error) {
 		conf.BatchSize,
 		conf.Epochs,
 		conf.LearningRate)
-	if err != nil {
-		return multilayer.MultiLayerPerceptron{}, err
-	}
-
-	return nn, nil
 }

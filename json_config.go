@@ -25,14 +25,10 @@ func parseConfig(filename string) (Config, error) {
 	if err != nil {
 		return Config{}, err
 	}
-
 	config := Config{}
 
-	if err := json.Unmarshal(file, &config); err != nil {
-		return Config{}, err
-	}
-
-	return config, nil
+	err = json.Unmarshal(file, &config)
+	return config, err
 }
 
 func (c Config) equal(other Config) bool {

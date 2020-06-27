@@ -46,6 +46,7 @@ func run() error {
 	} else if *predict && *model == "" || *file == "" {
 		return errors.New("need a named model to load and file to predict")
 	} else if *predict && *model != "" && *file != "" {
+
 		return runPrediction(*model, *file)
 	}
 
