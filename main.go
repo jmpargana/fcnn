@@ -47,7 +47,6 @@ func run() error {
 		return errors.New("need a named model to load and file to predict")
 	} else if *predict && *model != "" && *file != "" {
 		return runPrediction(*model, *file)
-	} else if !*train {
 	}
 
 	config, err := parseConfig(*config)
