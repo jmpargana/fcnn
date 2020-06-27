@@ -82,11 +82,8 @@ func saveNetwork(nn multilayer.MultiLayerPerceptron, modelName, reader string) e
 		return err
 	}
 
-	if err := ioutil.WriteFile("models/"+modelName+".model.gob", data, 0644); err != nil {
-		return err
-	}
-
-	return nil
+	err = ioutil.WriteFile("models/"+modelName+".model.gob", data, 0644)
+	return err
 }
 
 // fromParsedConfig just creates an instance of a fcnn given a Config struct.
