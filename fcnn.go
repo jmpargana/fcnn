@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"time"
@@ -10,13 +11,12 @@ import (
 )
 
 func start(conf Config) error {
-	// load data from reader using a bufio not to overload cpu memory
-	train, err := readers.Mnist(conf.TrainData, conf.ValidationData)
-
 	nn, err := fromParsedConfig(conf)
 	if err != nil {
 		return err
 	}
+
+	train, err := readers.DatasetReaders[nn.Reader].Read(conf.TrainData, conf.ValidationData)
 
 	for i := 0; i < conf.Epochs; i++ {
 		for j := range train {
@@ -43,15 +43,17 @@ func runPrediction(modelName, filename string) error {
 		return err
 	}
 
-	// predict here
-	_ = nn
+	result, err := readers.DatasetReaders[nn.Reader].DataFromFile(filename)
+	fmt.Println(result)
 
-	return nil
+	return err
 }
 
 // loadModel loads a gob file with an existing trained neural network.
 func loadModel(modelName string) (multilayer.MultiLayerPerceptron, error) {
 	f, err := os.Open("models/" + modelName + ".model.gob")
+	defer f.Close()
+
 	if err != nil {
 		return multilayer.MultiLayerPerceptron{}, err
 	}
@@ -91,5 +93,6 @@ func fromParsedConfig(conf Config) (multilayer.MultiLayerPerceptron, error) {
 		conf.OutActFn,
 		conf.BatchSize,
 		conf.Epochs,
-		conf.LearningRate)
+		conf.LearningRate,
+		conf.Reader)
 }

@@ -15,6 +15,7 @@ type MultiLayerPerceptron struct {
 	learningRate         float64
 	deltas, weights      []matrix.Matrix
 	lastInput            matrix.Matrix
+	Reader               string
 }
 
 // wrapMultiLayerPerceptron is a wrapper to help marshaling the neural network
@@ -26,4 +27,5 @@ type wrapMultiLayerPerceptron struct {
 	LearningRate         float64
 	Deltas, Weights      []matrix.Matrix
 	LastInput            matrix.Matrix
+	Reader               string
 }

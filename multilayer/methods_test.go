@@ -13,7 +13,7 @@ func TestForwProp(t *testing.T) {
 		in := matrix.New(3, 1)
 		expected := i
 
-		nn, err := New([]int{3, 5, 6, 5, 2}, expected, "relu", "relu", 1, 1, 0.5)
+		nn, err := New([]int{3, 5, 6, 5, 2}, expected, "relu", "relu", 1, 1, 0.5, "mnist")
 		if err != nil {
 			t.Errorf("no reason to fail here: %v", err)
 		}
@@ -31,7 +31,7 @@ func TestForwProp(t *testing.T) {
 
 func TestInvalidForwProp(t *testing.T) {
 	in := matrix.New(4, 1)
-	nn, _ := New([]int{1, 2}, 2, "relu", "relu", 1, 1, 0.5)
+	nn, _ := New([]int{1, 2}, 2, "relu", "relu", 1, 1, 0.5, "mnist")
 	_, err := nn.ForwProp(in)
 	if err == nil {
 		t.Errorf("should only accept right input size")
@@ -45,7 +45,7 @@ func TestCalculateDeltaMiddle(t *testing.T) {
 		prevDelta := matrix.NewFrom(test.prevDelta)
 		sum := matrix.NewFrom(test.sum)
 
-		nn, _ := New(test.HiddenLayers, 1, test.actFn, "relu", 1, 1, 0.5)
+		nn, _ := New(test.HiddenLayers, 1, test.actFn, "relu", 1, 1, 0.5, "mnist")
 		nn.HiddenLayers[len(nn.HiddenLayers)-2].Sum = sum
 		nn.HiddenLayers[len(nn.HiddenLayers)-1].Weights = matrixPlus1
 		nn.deltas[len(nn.HiddenLayers)-1] = prevDelta
@@ -67,7 +67,7 @@ func TestCalculateDeltaLastHidden(t *testing.T) {
 		prevDelta := matrix.NewFrom(test.prevDelta)
 		sum := matrix.NewFrom(test.sum)
 
-		nn, _ := New(test.HiddenLayers, matrixPlus1.NumRows, test.actFn, "relu", 1, 1, 0.5)
+		nn, _ := New(test.HiddenLayers, matrixPlus1.NumRows, test.actFn, "relu", 1, 1, 0.5, "mnist")
 		nn.HiddenLayers[len(nn.HiddenLayers)-1].Sum = sum
 		nn.outputLayer.Weights = matrixPlus1
 		nn.deltas[len(nn.HiddenLayers)] = prevDelta
@@ -88,7 +88,7 @@ func TestCalculateDeltaOut(t *testing.T) {
 		expected := matrix.NewFrom(test.expected)
 		sum := matrix.NewFrom(test.sum)
 
-		nn, _ := New([]int{1, 1}, output.NumRows, "relu", test.actFn, 1, 1, 0.5)
+		nn, _ := New([]int{1, 1}, output.NumRows, "relu", test.actFn, 1, 1, 0.5, "mnist")
 		nn.outputLayer.Sum = sum
 		nn.outputLayer.Output, _ = layer.ActivationFunctions[test.actFn](sum)
 
@@ -108,7 +108,7 @@ func TestFailCalculateDelta(t *testing.T) {
 		prevDelta := matrix.NewFrom(test.prevDelta)
 		sum := matrix.NewFrom(test.sum)
 
-		nn, _ := New(test.HiddenLayers, 1, test.actFn, "relu", 1, 1, 0.5)
+		nn, _ := New(test.HiddenLayers, 1, test.actFn, "relu", 1, 1, 0.5, "mnist")
 		nn.HiddenLayers[len(nn.HiddenLayers)-2].Sum = sum
 		nn.HiddenLayers[len(nn.HiddenLayers)-1].Weights = matrixPlus1
 		nn.deltas[len(nn.HiddenLayers)-1] = prevDelta
@@ -127,7 +127,7 @@ func TestUpdateBias(t *testing.T) {
 		bias := matrix.NewFrom(test.biasWeights)
 		expected := matrix.NewFrom(test.expected)
 
-		nn, _ := New(test.HiddenLayers, 1, test.actFn, "relu", 1, 1, test.learningRate)
+		nn, _ := New(test.HiddenLayers, 1, test.actFn, "relu", 1, 1, test.learningRate, "mnist")
 		nn.deltas[index] = delta
 		nn.HiddenLayers[index].Bias = bias
 
@@ -154,7 +154,7 @@ func TestUpdateBiasOut(t *testing.T) {
 		bias := matrix.NewFrom(test.biasWeights)
 		expected := matrix.NewFrom(test.expected)
 
-		nn, _ := New(test.HiddenLayers, test.HiddenLayers[len(test.HiddenLayers)-1], test.actFn, "relu", 1, 1, test.learningRate)
+		nn, _ := New(test.HiddenLayers, test.HiddenLayers[len(test.HiddenLayers)-1], test.actFn, "relu", 1, 1, test.learningRate, "mnist")
 		nn.deltas[len(nn.deltas)-1] = delta
 		nn.outputLayer.Bias = bias
 
@@ -180,7 +180,7 @@ func TestUpdateBiasOutFail(t *testing.T) {
 		delta := matrix.NewFrom(test.delta)
 		bias := matrix.NewFrom(test.biasWeights)
 
-		nn, _ := New(test.HiddenLayers, test.HiddenLayers[len(test.HiddenLayers)-1], test.actFn, "relu", 1, 1, test.learningRate)
+		nn, _ := New(test.HiddenLayers, test.HiddenLayers[len(test.HiddenLayers)-1], test.actFn, "relu", 1, 1, test.learningRate, "mnist")
 		nn.deltas[len(nn.deltas)-1] = delta
 		nn.outputLayer.Bias = bias
 
@@ -204,7 +204,7 @@ func TestUpdateWeights(t *testing.T) {
 		weight := matrix.NewFrom(test.biasWeights)
 		expected := matrix.NewFrom(test.expected)
 
-		nn, _ := New(test.HiddenLayers, 1, test.actFn, "relu", 1, 1, test.learningRate)
+		nn, _ := New(test.HiddenLayers, 1, test.actFn, "relu", 1, 1, test.learningRate, "mnist")
 		nn.weights[index] = delta
 		nn.HiddenLayers[index].Weights = weight
 
@@ -232,7 +232,7 @@ func TestUpdateWeightsOut(t *testing.T) {
 		weight := matrix.NewFrom(test.biasWeights)
 		expected := matrix.NewFrom(test.expected)
 
-		nn, _ := New(test.HiddenLayers, 1, test.actFn, "relu", 1, 1, test.learningRate)
+		nn, _ := New(test.HiddenLayers, 1, test.actFn, "relu", 1, 1, test.learningRate, "mnist")
 		nn.weights[index] = delta
 		nn.outputLayer.Weights = weight
 
@@ -259,7 +259,7 @@ func TestUpdateWeightsFail(t *testing.T) {
 		delta := matrix.NewFrom(test.delta)
 		weight := matrix.NewFrom(test.biasWeights)
 
-		nn, _ := New(test.HiddenLayers, 1, test.actFn, "relu", 1, 1, test.learningRate)
+		nn, _ := New(test.HiddenLayers, 1, test.actFn, "relu", 1, 1, test.learningRate, "mnist")
 		nn.weights[index] = delta
 		nn.HiddenLayers[index].Weights = weight
 
@@ -277,7 +277,7 @@ func TestUpdateWeightsFail(t *testing.T) {
 
 func TestCalculateWeight(t *testing.T) {
 	for _, test := range calculateWeightTest {
-		nn, _ := New(test.HiddenLayers, 1, "relu", "relu", 1, 1, 0.1)
+		nn, _ := New(test.HiddenLayers, 1, "relu", "relu", 1, 1, 0.1, "mnist")
 		index := test.index
 
 		prevOut := matrix.NewFrom(test.prevOut)
@@ -305,7 +305,7 @@ func TestCalculateWeight(t *testing.T) {
 
 func TestCalculateWeightFirst(t *testing.T) {
 	for _, test := range calculateWeightTestOut {
-		nn, _ := New(test.HiddenLayers, 1, "relu", "relu", 1, 1, 0.1)
+		nn, _ := New(test.HiddenLayers, 1, "relu", "relu", 1, 1, 0.1, "mnist")
 
 		prevOut := matrix.NewFrom(test.prevOut)
 		delta := matrix.NewFrom(test.delta)
@@ -332,7 +332,7 @@ func TestCalculateWeightFirst(t *testing.T) {
 
 func TestInvalidCalculateWeight(t *testing.T) {
 	for _, test := range calculateWeightTestInvalid {
-		nn, _ := New(test.HiddenLayers, 1, "relu", "relu", 1, 1, 0.1)
+		nn, _ := New(test.HiddenLayers, 1, "relu", "relu", 1, 1, 0.1, "mnist")
 
 		prevOut := matrix.NewFrom(test.prevOut)
 		delta := matrix.NewFrom(test.delta)
@@ -355,7 +355,7 @@ func TestInvalidCalculateWeight(t *testing.T) {
 
 func TestGradientDescent(t *testing.T) {
 	for _, test := range gradientDescentTest {
-		nn, _ := New(test.HiddenLayers, test.outputLayer, "relu", "relu", 1, 1, test.learningRate)
+		nn, _ := New(test.HiddenLayers, test.outputLayer, "relu", "relu", 1, 1, test.learningRate, "mnist")
 
 		var deltaBias []matrix.Matrix
 		var deltaWeights []matrix.Matrix

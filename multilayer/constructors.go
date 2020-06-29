@@ -20,7 +20,8 @@ func New(HiddenLayers []int,
 	outputActFn string,
 	batchSize,
 	epochSize int,
-	learningRate float64) (MultiLayerPerceptron, error) {
+	learningRate float64,
+	reader string) (MultiLayerPerceptron, error) {
 
 	if batchSize < 1 || epochSize < 1 {
 		return MultiLayerPerceptron{}, errors.New("can't create neural network with negative batch or epoch size")
@@ -55,6 +56,7 @@ func New(HiddenLayers []int,
 		weights:      weights,
 		deltas:       deltas,
 		lastInput:    lastInput,
+		Reader:       reader,
 	}, nil
 }
 

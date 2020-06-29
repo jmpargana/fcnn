@@ -10,6 +10,7 @@ func TestDecoder(t *testing.T) {
 		actFn, outActFn string
 		batch, epoch    int
 		lRate           float64
+		reader          string
 	}{
 		"simple mlp": {
 			[]int{3, 4, 6},
@@ -19,12 +20,13 @@ func TestDecoder(t *testing.T) {
 			1,
 			1,
 			0.2,
+			"mnist",
 		},
 	}
 
 	for name, tc := range tt {
 		t.Run(name, func(t *testing.T) {
-			m, err := New(tc.hLayers, tc.oLayer, tc.actFn, tc.outActFn, tc.batch, tc.epoch, tc.lRate)
+			m, err := New(tc.hLayers, tc.oLayer, tc.actFn, tc.outActFn, tc.batch, tc.epoch, tc.lRate, tc.reader)
 			if err != nil {
 				t.Errorf("failed in constructor: %v", err)
 			}

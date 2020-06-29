@@ -1,7 +1,7 @@
 // MNIST database reader
 // http://yann.lecun.com/exdb/mnist/
 // https://gist.githubusercontent.com/higuma/dbcd006546eb844c01e5102b4d0bcc93/raw/e3f3b72a0d3a212bfa0b65feb52d7a73bcf72913/mnist.go
-package readers
+package mnist
 
 import (
 	"fmt"
@@ -10,10 +10,10 @@ import (
 )
 
 const (
-	TrainImagesFile = "train-images-idx3-ubyte"
-	TrainLabelsFile = "train-labels-idx1-ubyte"
-	TestImagesFile  = "t10k-images-idx3-ubyte"
-	TestLabelsFile  = "t10k-labels-idx1-ubyte"
+	TrainImagesFile = "../../datasets/train-images-idx3-ubyte"
+	TrainLabelsFile = "../../datasets/train-labels-idx1-ubyte"
+	TestImagesFile  = "../../datasets/t10k-images-idx3-ubyte"
+	TestLabelsFile  = "../../datasets/t10k-labels-idx1-ubyte"
 
 	labelsFileMagic = 0x00000801
 	imagesFileMagic = 0x00000803
