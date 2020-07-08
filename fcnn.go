@@ -16,7 +16,7 @@ func start(conf Config) error {
 		return err
 	}
 
-	train, err := readers.DatasetReaders[nn.Reader].Read(conf.TrainData, conf.ValidationData)
+	train, err := readers.DatasetReaders[nn.Reader].DataFrom(conf.TrainData, conf.ValidationData)
 
 	for i := 0; i < conf.Epochs; i++ {
 		for j := range train {
@@ -33,6 +33,7 @@ func start(conf Config) error {
 			// should only perform gradient descent batchwise
 		}
 	}
+	// TODO: validate nn with test images
 
 	return saveNetwork(nn, conf.Model, conf.Reader)
 }
@@ -43,7 +44,7 @@ func runPrediction(modelName, filename string) error {
 		return err
 	}
 
-	result, err := readers.DatasetReaders[nn.Reader].DataFromFile(filename)
+	result, err := readers.DatasetReaders[nn.Reader].PredictDataFrom(filename)
 	fmt.Println(result)
 
 	return err

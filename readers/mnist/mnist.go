@@ -6,15 +6,9 @@ package mnist
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 )
 
 const (
-	TrainImagesFile = "../../datasets/train-images-idx3-ubyte"
-	TrainLabelsFile = "../../datasets/train-labels-idx1-ubyte"
-	TestImagesFile  = "../../datasets/t10k-images-idx3-ubyte"
-	TestLabelsFile  = "../../datasets/t10k-labels-idx1-ubyte"
-
 	labelsFileMagic = 0x00000801
 	imagesFileMagic = 0x00000803
 
@@ -113,7 +107,7 @@ func readLabelsFile(path string) (*labelData, error) {
 // Single digit+image datum
 type DigitImage struct {
 	Digit int
-	Image [][]uint8
+	Image [][]float64
 }
 
 // Data set
@@ -149,69 +143,16 @@ func ReadDataSet(imagesPath, labelsPath string) (*DataSet, error) {
 	return dataSet, nil
 }
 
-func ReadTrainSet(dir string) (*DataSet, error) {
-	imagesPath := filepath.Join(dir, TrainImagesFile)
-	labelsPath := filepath.Join(dir, TrainLabelsFile)
-	return ReadDataSet(imagesPath, labelsPath)
-}
-
-func ReadTestSet(dir string) (*DataSet, error) {
-	imagesPath := filepath.Join(dir, TestImagesFile)
-	labelsPath := filepath.Join(dir, TestLabelsFile)
-	return ReadDataSet(imagesPath, labelsPath)
-}
-
-func splitToRows(data []uint8, N, H int) [][]uint8 {
+func splitToRows(data []uint8, N, H int) [][]float64 {
 	nR := N * H
-	rows := make([][]uint8, nR)
+	rows := make([][]float64, nR)
 	for i := 0; i < nR; i++ {
-		rows[i] = data[0:H]
+		floatData := make([]float64, H)
+		for j := 0; j < H; j++ {
+			floatData[j] = float64(data[j])
+		}
+		rows[i] = floatData[0:H]
 		data = data[H:]
 	}
 	return rows
 }
-
-// (debugging utility)
-func PrintImage(image [][]uint8) {
-	for _, row := range image {
-		for _, pix := range row {
-			if pix == 0 {
-				fmt.Print(" ")
-			} else {
-				fmt.Printf("%X", pix/16)
-			}
-		}
-		fmt.Println()
-	}
-}
-
-/***
-// SAMPLE USAGE
-// ============
-import (
-	"fmt"
-	"./mnist"
-)
-
-func printData(dataSet *mnist.DataSet, index int) {
-	data := dataSet.Data[index]
-	fmt.Println(data.Digit)			// print Digit (label)
-	mnist.PrintImage(data.Image)	// print Image
-}
-
-func main() {
-	dataSet, err := mnist.ReadTrainSet("./mnist")
-	// or dataSet, err := mnist.ReadTestSet("./mnist")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	fmt.Println(dataSet.N)		// number of data
-	fmt.Println(dataSet.W)		// image width [pixel]
-	fmt.Println(dataSet.H)		// image height [pixel]
-	for i := 0; i < 10; i++ {
-		printData(dataSet, i)
-	}
-	printData(dataSet, dataSet.N-1)
-}
-***/
