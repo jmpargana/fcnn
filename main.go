@@ -43,16 +43,18 @@ func run() error {
 		return errors.New("can't predict and train at the same time")
 	} else if !*predict && !*train {
 		return errors.New("the neural network needs to do something. either train or predict!")
-	} else if *predict && *model == "" || *file == "" {
+	} else if *predict && (*model == "" || *file == "") {
 		return errors.New("need a named model to load and file to predict")
 	} else if *predict && *model != "" && *file != "" {
 
 		return runPrediction(*model, *file)
+	} else if *config == "" {
+		return errors.New("need a config file to load")
 	}
 
 	config, err := parseConfig(*config)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to parse config file: %v", err)
 	}
 
 	return start(config)

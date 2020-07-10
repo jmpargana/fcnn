@@ -25,6 +25,7 @@ func parseConfig(filename string) (Config, error) {
 	if err != nil {
 		return Config{}, err
 	}
+
 	config := Config{}
 
 	err = json.Unmarshal(file, &config)

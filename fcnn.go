@@ -17,6 +17,9 @@ func start(conf Config) error {
 	}
 
 	train, err := readers.DatasetReaders[nn.Reader].DataFrom(conf.TrainData, conf.ValidationData)
+	if err != nil {
+		return fmt.Errorf("failed to read training data: %v", err)
+	}
 
 	for i := 0; i < conf.Epochs; i++ {
 		for j := range train {

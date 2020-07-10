@@ -22,8 +22,8 @@ func (m Mnist) DataFrom(images, labels string) ([]Instance, error) {
 	instances := make([]Instance, dataset.N)
 	for i, dataImage := range dataset.Data {
 		label := matrix.New(10, 1)
-		if err := label.Set(dataImage.Digit-1, 1, 1); err != nil {
-			return nil, fmt.Errorf("failed creating label: %v", err)
+		if err := label.Set(dataImage.Digit, 0, 1); err != nil {
+			return nil, fmt.Errorf("failed assigning label: %v", err)
 		}
 
 		instances[i] = Instance{
@@ -37,7 +37,7 @@ func (m Mnist) DataFrom(images, labels string) ([]Instance, error) {
 
 // Credits to: https://github.com/sausheong/gonn
 func (m Mnist) PredictDataFrom(filename string) (matrix.Matrix, error) {
-	f, err := os.Open("../" + filename)
+	f, err := os.Open(filename)
 	defer f.Close()
 	if err != nil {
 		return matrix.Matrix{}, err
