@@ -15,7 +15,7 @@ import (
 type Mnist struct{}
 
 func (m Mnist) DataFrom(images, labels string) ([]Instance, error) {
-	log.Println("Fetching dataset:")
+	log.Println("Fetching dataset")
 
 	dataset, err := mnist.ReadDataSet(images, labels)
 	if err != nil {
@@ -34,9 +34,6 @@ func (m Mnist) DataFrom(images, labels string) ([]Instance, error) {
 			Label: label,
 		}
 	}
-
-	log.Println("Finished fetching dataset.")
-
 	return instances, nil
 }
 

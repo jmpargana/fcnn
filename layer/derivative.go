@@ -92,6 +92,9 @@ func dArcTan(in matrix.Matrix) (m matrix.Matrix, err error) {
 }
 
 // TODO: implement
-func dSoftmax(in matrix.Matrix) (matrix.Matrix, error) {
-	return matrix.Matrix{}, nil
+func dSoftmax(in matrix.Matrix) (m matrix.Matrix, err error) {
+	m, err = apply(in, func(x float64) float64 {
+		return x * (1 - x)
+	})
+	return
 }

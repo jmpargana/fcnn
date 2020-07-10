@@ -6,8 +6,6 @@ package mnist
 import (
 	"fmt"
 	"os"
-
-	"github.com/cheggaaa/pb/v3"
 )
 
 const (
@@ -139,15 +137,11 @@ func ReadDataSet(imagesPath, labelsPath string) (*DataSet, error) {
 
 	vecs := splitToVecs(images.Data, images.N, images.H, images.W)
 
-	bar := pb.StartNew(dataSet.N)
 	for i := 0; i < dataSet.N; i++ {
-
-		bar.Increment()
 		data := &dataSet.Data[i]
 		data.Digit = int(labels.Data[i])
 		data.Image = vecs[i]
 	}
-	bar.Finish()
 
 	return dataSet, nil
 }

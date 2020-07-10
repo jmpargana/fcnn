@@ -23,10 +23,7 @@ func start(conf Config) error {
 		return fmt.Errorf("failed to read training data: %v", err)
 	}
 
-	epochsBar := pb.StartNew(conf.Epochs)
-
 	for i := 0; i < conf.Epochs; i++ {
-		epochsBar.Increment()
 		trainBar := pb.StartNew(len(train))
 		log.Printf("Starting epoch nr: %d\n", i+1)
 
@@ -47,7 +44,6 @@ func start(conf Config) error {
 		}
 		trainBar.Finish()
 	}
-	epochsBar.Finish()
 	// TODO: validate nn with test images
 
 	return saveNetwork(nn, conf.Model, conf.Reader)
@@ -58,6 +54,7 @@ func runPrediction(modelName, filename string) error {
 	if err != nil {
 		return err
 	}
+	fmt.Println(nn)
 
 	result, err := readers.DatasetReaders[nn.Reader].PredictDataFrom(filename)
 	fmt.Println(result)
@@ -68,6 +65,9 @@ func runPrediction(modelName, filename string) error {
 // loadModel loads a gob file with an existing trained neural network.
 func loadModel(modelName string) (multilayer.MultiLayerPerceptron, error) {
 	f, err := os.Open("models/" + modelName + ".model.gob")
+	if err != nil {
+		return multilayer.MultiLayerPerceptron{}, fmt.Errorf("failed opening model: %v", err)
+	}
 	defer f.Close()
 
 	if err != nil {
@@ -79,7 +79,6 @@ func loadModel(modelName string) (multilayer.MultiLayerPerceptron, error) {
 	if err != nil {
 		return multilayer.MultiLayerPerceptron{}, err
 	}
-
 	err = nn.UnmarshalBinary(data)
 	return nn, err
 }
@@ -91,11 +90,13 @@ func saveNetwork(nn multilayer.MultiLayerPerceptron, modelName, reader string) e
 		modelName = reader + time.Now().String()
 	}
 
+	log.Printf("Saving trained model: %s in models directory", modelName)
+	_ = os.Mkdir("models/", os.ModePerm)
+
 	data, err := nn.MarshalBinary()
 	if err != nil {
 		return err
 	}
-
 	return ioutil.WriteFile("models/"+modelName+".model.gob", data, 0644)
 }
 

@@ -96,13 +96,23 @@ func arcTan(in matrix.Matrix) (m matrix.Matrix, err error) {
 func softmax(in matrix.Matrix) (matrix.Matrix, error) {
 
 	sum := 0.0
+	max := math.Inf(-1)
 	for row := 0; row < in.NumRows; row++ {
 		elem, err := in.Get(row, 0)
 		if err != nil {
 			return matrix.Matrix{}, err
 		}
+		if elem > max {
+			max = elem
+		}
+	}
 
-		sum += math.Exp(elem)
+	for row := 0; row < in.NumRows; row++ {
+		elem, err := in.Get(row, 0)
+		if err != nil {
+			return matrix.Matrix{}, err
+		}
+		sum += math.Exp(elem - max)
 	}
 
 	m := matrix.New(in.NumRows, 1)
