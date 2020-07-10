@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"image"
 	"image/png"
+	"log"
 	"os"
 
 	"github.com/jmpargana/fcnn/readers/mnist"
@@ -14,6 +15,8 @@ import (
 type Mnist struct{}
 
 func (m Mnist) DataFrom(images, labels string) ([]Instance, error) {
+	log.Println("Fetching dataset:")
+
 	dataset, err := mnist.ReadDataSet(images, labels)
 	if err != nil {
 		return nil, fmt.Errorf("failed loading dataset: %v", err)
@@ -27,10 +30,12 @@ func (m Mnist) DataFrom(images, labels string) ([]Instance, error) {
 		}
 
 		instances[i] = Instance{
-			Image: matrix.NewFrom(dataImage.Image),
+			Image: matrix.NewFromVec(len(dataImage.Image), 1, dataImage.Image),
 			Label: label,
 		}
 	}
+
+	log.Println("Finished fetching dataset.")
 
 	return instances, nil
 }

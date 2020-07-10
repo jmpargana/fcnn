@@ -37,6 +37,7 @@ func (m *MultiLayerPerceptron) BackProp(output matrix.Matrix) error {
 	wgBackProp := new(sync.WaitGroup)
 
 	for i := len(m.deltas) - 1; i > 1; i-- {
+
 		if err := m.calculateDelta(i, output); err != nil {
 			return err
 		}

@@ -3,9 +3,11 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"time"
 
+	"github.com/cheggaaa/pb"
 	"github.com/jmpargana/fcnn/multilayer"
 	"github.com/jmpargana/fcnn/readers"
 )
@@ -21,8 +23,16 @@ func start(conf Config) error {
 		return fmt.Errorf("failed to read training data: %v", err)
 	}
 
+	epochsBar := pb.StartNew(conf.Epochs)
+
 	for i := 0; i < conf.Epochs; i++ {
+		epochsBar.Increment()
+		trainBar := pb.StartNew(len(train))
+		log.Printf("Starting epoch nr: %d\n", i+1)
+
 		for j := range train {
+			trainBar.Increment()
+
 			if _, err := nn.ForwProp(train[j].Image); err != nil {
 				return err
 			}
@@ -35,7 +45,9 @@ func start(conf Config) error {
 			// TODO: log intermediate scores to user and
 			// should only perform gradient descent batchwise
 		}
+		trainBar.Finish()
 	}
+	epochsBar.Finish()
 	// TODO: validate nn with test images
 
 	return saveNetwork(nn, conf.Model, conf.Reader)

@@ -6,6 +6,8 @@ package mnist
 import (
 	"fmt"
 	"os"
+
+	"github.com/cheggaaa/pb/v3"
 )
 
 const (
@@ -107,7 +109,7 @@ func readLabelsFile(path string) (*labelData, error) {
 // Single digit+image datum
 type DigitImage struct {
 	Digit int
-	Image [][]float64
+	Image []float64
 }
 
 // Data set
@@ -132,27 +134,36 @@ func ReadDataSet(imagesPath, labelsPath string) (*DataSet, error) {
 		return nil, fmt.Errorf(msgSizeUnmatch, labelsPath, imagesPath)
 	}
 	dataSet := &DataSet{N: images.N, W: images.W, H: images.H}
+
 	dataSet.Data = make([]DigitImage, dataSet.N)
-	rows := splitToRows(images.Data, images.N, images.H)
+
+	vecs := splitToVecs(images.Data, images.N, images.H, images.W)
+
+	bar := pb.StartNew(dataSet.N)
 	for i := 0; i < dataSet.N; i++ {
+
+		bar.Increment()
 		data := &dataSet.Data[i]
 		data.Digit = int(labels.Data[i])
-		data.Image = rows[0:dataSet.H]
-		rows = rows[dataSet.H:]
+		data.Image = vecs[i]
 	}
+	bar.Finish()
+
 	return dataSet, nil
 }
 
-func splitToRows(data []uint8, N, H int) [][]float64 {
-	nR := N * H
-	rows := make([][]float64, nR)
-	for i := 0; i < nR; i++ {
-		floatData := make([]float64, H)
-		for j := 0; j < H; j++ {
+func splitToVecs(data []uint8, N, H, W int) [][]float64 {
+	vecs := make([][]float64, N)
+
+	for i := 0; i < N; i++ {
+		floatData := make([]float64, H*W)
+
+		for j := 0; j < H*W; j++ {
 			floatData[j] = float64(data[j])
 		}
-		rows[i] = floatData[0:H]
-		data = data[H:]
+
+		vecs[i] = floatData
+		data = data[H*W:]
 	}
-	return rows
+	return vecs
 }

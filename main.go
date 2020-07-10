@@ -30,8 +30,7 @@ func main() {
 		flag.PrintDefaults()
 	}
 	if err := run(); err != nil {
-		fmt.Fprintf(os.Stderr, "%v\n\n", err)
-		flag.Usage()
+		fmt.Fprintf(os.Stderr, "\n%v\n", err)
 		os.Exit(1)
 	}
 }
@@ -40,15 +39,20 @@ func run() error {
 	flag.Parse()
 
 	if *predict && *train {
+		flag.Usage()
 		return errors.New("can't predict and train at the same time")
 	} else if !*predict && !*train {
+		flag.Usage()
 		return errors.New("the neural network needs to do something. either train or predict!")
 	} else if *predict && (*model == "" || *file == "") {
+		flag.Usage()
 		return errors.New("need a named model to load and file to predict")
 	} else if *predict && *model != "" && *file != "" {
 
 		return runPrediction(*model, *file)
+
 	} else if *config == "" {
+		flag.Usage()
 		return errors.New("need a config file to load")
 	}
 
