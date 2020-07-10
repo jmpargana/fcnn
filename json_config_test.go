@@ -19,9 +19,9 @@ func TestParseConfig(t *testing.T) {
 				Model:          "mnist",
 				BatchSize:      10,
 				Epochs:         3,
-				Reader:         "../readers/mnist.go",
-				TrainData:      "../datasets/train-images-idx3-ubyte",
-				ValidationData: "../datasets/train-labels-idx3-ubyte",
+				Reader:         "mnist",
+				TrainData:      "datasets/train-images-idx3-ubyte",
+				ValidationData: "datasets/train-labels-idx1-ubyte",
 			},
 		},
 	}
