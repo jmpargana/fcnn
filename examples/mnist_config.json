@@ -3,7 +3,7 @@
     "hidden_layers": [784,100,50],
     "output": 10,
     "activation_function": "relu",
-    "out_activation_function": "softmax",
+    "out_activation_function": "sigmoid",
     "learning_rate": 0.1,
     "epochs": 3,
     "batch_size": 10,
