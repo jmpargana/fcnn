@@ -3,10 +3,11 @@ package multilayer
 import "fmt"
 
 func (m *MultiLayerPerceptron) String() (s string) {
-	for _, hidden := range m.HiddenLayers {
-		s += fmt.Sprintln(hidden)
+	for i, hidden := range m.HiddenLayers {
+		s += fmt.Sprintf("Hidden Layer nr: %d\n", i)
+		s += fmt.Sprintln(hidden.String())
 	}
-	s += fmt.Sprintln(m.outputLayer)
-
+	s += fmt.Sprintln("Output Layer!")
+	s += fmt.Sprintln(m.outputLayer.String())
 	return
 }

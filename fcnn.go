@@ -54,7 +54,7 @@ func runPrediction(modelName, filename string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(nn)
+	fmt.Println(nn.String())
 
 	result, err := readers.DatasetReaders[nn.Reader].PredictDataFrom(filename)
 	fmt.Println(result)
