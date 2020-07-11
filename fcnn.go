@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"math"
 	"os"
 	"time"
 
@@ -54,12 +55,26 @@ func runPrediction(modelName, filename string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(nn.String())
 
-	result, err := readers.DatasetReaders[nn.Reader].PredictDataFrom(filename)
-	fmt.Println(result)
+	img, err := readers.DatasetReaders[nn.Reader].PredictDataFrom(filename)
 
-	return err
+	res, err := nn.ForwProp(img)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(res)
+
+	max := math.Inf(-1)
+	for i := 0; i < res.NumRows; i++ {
+		elem, _ := res.Get(i, 0)
+		if elem > max {
+			max = float64(i)
+		}
+	}
+	fmt.Println(filename, "contains a:", max)
+
+	return nil
 }
 
 // loadModel loads a gob file with an existing trained neural network.

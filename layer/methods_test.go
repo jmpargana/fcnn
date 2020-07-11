@@ -36,6 +36,7 @@ func TestForwPropInvalidInput2(t *testing.T) {
 func TestForwProp(t *testing.T) {
 	for _, fp := range forwPropsTest {
 		layer, err := New(fp.actFn, len(fp.in), len(fp.out))
+		layer.Bias = matrix.New(len(fp.out), 1)
 		if err != nil {
 			t.Errorf("shouldn't fail here: %v", err)
 		}

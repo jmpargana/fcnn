@@ -1,6 +1,8 @@
 package layer
 
-import "github.com/jmpargana/matrix"
+import (
+	"github.com/jmpargana/matrix"
+)
 
 // apply is called in most of the activation functions and its derivatives.
 func apply(in matrix.Matrix, f func(float64) float64) (matrix.Matrix, error) {
@@ -13,6 +15,5 @@ func apply(in matrix.Matrix, f func(float64) float64) (matrix.Matrix, error) {
 		}
 		res.Set(row, 0, f(elem))
 	}
-
 	return res, nil
 }

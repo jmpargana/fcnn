@@ -18,6 +18,7 @@ func (m *MultiLayerPerceptron) MarshalBinary() ([]byte, error) {
 		Weights:      m.weights,
 		Deltas:       m.deltas,
 		LastInput:    m.lastInput,
+		Reader:       m.Reader,
 	}
 
 	buf := new(bytes.Buffer)
@@ -46,6 +47,7 @@ func (m *MultiLayerPerceptron) UnmarshalBinary(data []byte) error {
 	m.weights = w.Weights
 	m.deltas = w.Deltas
 	m.lastInput = w.LastInput
+	m.Reader = w.Reader
 
 	return nil
 }

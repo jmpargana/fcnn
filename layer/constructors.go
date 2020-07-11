@@ -23,7 +23,8 @@ func New(actFn string, inSize, outSize int) (Layer, error) {
 	}
 
 	weights := matrix.NewRandom(outSize, inSize)
-	output, sum, bias := matrix.New(outSize, 1), matrix.New(outSize, 1), matrix.New(outSize, 1)
+	bias := matrix.NewRandom(outSize, 1)
+	output, sum := matrix.New(outSize, 1), matrix.New(outSize, 1)
 
 	return Layer{
 		actFn:   actFn,

@@ -62,7 +62,7 @@ func (m Mnist) PredictDataFrom(filename string) (matrix.Matrix, error) {
 	pixels := make([]float64, len(gray.Pix))
 
 	for i := 0; i < len(gray.Pix); i++ {
-		pixels[i] = (float64(255-gray.Pix[i]) / 255.0 * 0.99) + 0.01
+		pixels[i] = (float64(gray.Pix[i]) / 255 * 1)
 	}
 
 	return matrix.NewFromVec(len(pixels), 1, pixels), nil

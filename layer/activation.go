@@ -2,6 +2,7 @@ package layer
 
 import (
 	// import to dot to avoid package verbosity
+
 	"math"
 	"math/rand"
 
