@@ -2,7 +2,6 @@
 
 [![GoDoc](https://godoc.org/github.com/jmpargana/fcnn?status.svg)](https://godoc.org/github.com/jmpargana/fcnn)
 [![Build Status](https://travis-ci.org/jmpargana/ged.svg?branch=master)](https://travis-ci.org/jmpargana/fcnn)
-[![Status](https://travis-ci.org/jmpargana/matrix.svg?branch=master)](https://travis-ci.org/jmpargana/matrix)
 [![License](http://img.shields.io/:license-mit-blue.svg?style=flat-square)](LICENSE)
 
 fcnn is a scalable fully connected neural network completely written from scratch
